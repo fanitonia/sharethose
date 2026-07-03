@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Application.Features.Document.DTOs.Objects;
+namespace Application.Features.Documents.DTOs.Objects;
 
 public class PageObjectValidator : AbstractValidator<PageObject>
 {

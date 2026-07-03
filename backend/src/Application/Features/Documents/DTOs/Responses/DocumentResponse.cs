@@ -1,10 +1,10 @@
-﻿using Application.Features.Document.DTOs.Objects;
+﻿using Application.Features.Documents.DTOs.Objects;
 
-namespace Application.Features.Document.DTOs.Responses;
+namespace Application.Features.Documents.DTOs.Responses;
 
 public class DocumentResponse
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public required string Title { get; set; }

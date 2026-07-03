@@ -1,6 +1,6 @@
-﻿using Application.Features.Document.DTOs.Objects;
+﻿using Application.Features.Documents.DTOs.Objects;
 
-namespace Application.Features.Document.DTOs.Requests;
+namespace Application.Features.Documents.DTOs.Requests;
 
 public class CreateDocumentRequest
 {

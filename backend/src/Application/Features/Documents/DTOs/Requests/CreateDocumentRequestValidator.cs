@@ -1,11 +1,11 @@
-﻿using Application.Features.Document.DTOs.Objects;
+﻿using Application.Features.Documents.DTOs.Objects;
 using FluentValidation;
 
-namespace Application.Features.Document.DTOs.Requests;
+namespace Application.Features.Documents.DTOs.Requests;
 
-public class UpdateDocumentRequestValidator : AbstractValidator<UpdateDocumentRequest>
+public class CreateDocumentRequestValidator : AbstractValidator<CreateDocumentRequest>
 {
-    public UpdateDocumentRequestValidator()
+    public CreateDocumentRequestValidator()
     {
         RuleFor(q => q.Title)
             .NotEmpty()
