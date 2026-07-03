@@ -1,20 +1,20 @@
 ﻿using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Interfaces;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Features.Documents.Services;
 
-public class DocumentQueryService(DatabaseContext context, IMapper mapper) : IDocumentQueryService
+public class DocumentQueryService(DatabaseContext context) : IDocumentQueryService
 {
     public async Task<DocumentResponse?> GetDocumentAsync(string documentId, CancellationToken ct)
     {
-        return await context.Documents
+        var document = await context.Documents
             .AsNoTracking()
+            .Include(d => d.Pages)
             .Where(d => d.Id == documentId)
-            .ProjectTo<DocumentResponse>(mapper.ConfigurationProvider)
             .FirstOrDefaultAsync(ct);
+
+        return document is null ? null : new DocumentResponse(document);
     }
 }

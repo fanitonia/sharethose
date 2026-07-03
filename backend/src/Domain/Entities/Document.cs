@@ -11,16 +11,4 @@ public class Document
     public DateTime? ExpireAt { get; set; }
 
     public ICollection<Page> Pages { get; set; } = [];
-
-    public Document() { }
-
-    public Document(string id, string title, string passwordHash, string editKeyHash, Page[] pages, DateTime? expireAt = null)
-    {
-        Id = id;
-        Title = title;
-        PasswordHash = passwordHash;
-        EditKeyHash = editKeyHash;
-        ExpireAt = expireAt;
-        Pages = pages;
-    }
 }

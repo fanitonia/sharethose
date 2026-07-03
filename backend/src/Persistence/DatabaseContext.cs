@@ -6,7 +6,7 @@ namespace Persistence;
 
 public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options)
 {
-    public DbSet<Domain.Entities.Document> Documents { get; set; }
+    public DbSet<Document> Documents { get; set; }
     public DbSet<Page> Pages { get; set; }
 
 

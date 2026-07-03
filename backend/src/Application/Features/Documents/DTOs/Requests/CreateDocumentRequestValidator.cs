@@ -16,7 +16,7 @@ public class CreateDocumentRequestValidator : AbstractValidator<CreateDocumentRe
         RuleFor(q => q.Password)
             .NotEmpty()
                 .WithMessage("Password can't be empty.")
-            .When(q => q != null);
+            .When(q => q.Password != null);
 
         RuleFor(q => q.ExpireAt)
             .GreaterThan(DateTime.Now)

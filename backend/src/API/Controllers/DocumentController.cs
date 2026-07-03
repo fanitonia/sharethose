@@ -1,4 +1,5 @@
-﻿using Application.Features.Documents.DTOs.Responses;
+﻿using Application.Features.Documents.DTOs.Requests;
+using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +7,7 @@ namespace API.Controllers
 {
     [Route("api/document")]
     [ApiController]
-    public class DocumentController(IDocumentQueryService query) : ControllerBase
+    public class DocumentController(IDocumentQueryService query, IDocumentCommandService command) : ControllerBase
     {
 
         [HttpGet("{id}")]
@@ -20,6 +21,19 @@ namespace API.Controllers
             }
 
             return Ok(document);
+        }
+
+        [HttpPost()]
+        public async Task<ActionResult<DocumentResponse?>> CreateDocument([FromBody] CreateDocumentRequest request)
+        {
+            var result = await command.CreateDocumentAsync(request);
+
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+
+            return Ok(result.Value.document);
         }
     }
 }

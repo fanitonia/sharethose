@@ -17,5 +17,9 @@ public class PageObjectValidator : AbstractValidator<PageObject>
                 .WithMessage("Content is required.")
             .MaximumLength(100000)
                 .WithMessage("Content must not exceed 100000 characters.");
+
+        RuleFor(q => q.PageNumber)
+            .Must(pageNumber => pageNumber > 0)
+                .WithMessage("Page number must be greater than 0.");
     }
 }

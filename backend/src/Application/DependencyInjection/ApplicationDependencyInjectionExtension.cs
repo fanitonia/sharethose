@@ -10,11 +10,7 @@ public static class ApplicationDependencyInjectionExtension
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IDocumentQueryService, DocumentQueryService>();
-
-        services.AddAutoMapper(cfg =>
-        {
-            cfg.AddMaps(AppDomain.CurrentDomain.GetAssemblies());
-        });
+        services.AddScoped<IDocumentCommandService, DocumentCommandService>();
 
         return services;
     }
