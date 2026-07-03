@@ -12,7 +12,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260701184413_InitialBaseDesign")]
+    [Migration("20260703080558_InitialBaseDesign")]
     partial class InitialBaseDesign
     {
         /// <inheritdoc />
@@ -84,15 +84,15 @@ namespace Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("document_id");
 
+                    b.Property<string>("PageName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("page_name");
+
                     b.Property<short>("PageNumber")
                         .HasColumnType("smallint")
                         .HasColumnName("page_number");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("title");
 
                     b.HasKey("Id")
                         .HasName("pk_pages");

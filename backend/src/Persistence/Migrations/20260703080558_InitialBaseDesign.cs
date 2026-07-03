@@ -35,7 +35,7 @@ namespace Persistence.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    title = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    page_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     content = table.Column<string>(type: "character varying(100000)", maxLength: 100000, nullable: false),
                     page_number = table.Column<short>(type: "smallint", nullable: false),
                     document_id = table.Column<Guid>(type: "uuid", nullable: false)
