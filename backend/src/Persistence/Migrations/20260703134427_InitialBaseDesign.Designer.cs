@@ -12,7 +12,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260703080558_InitialBaseDesign")]
+    [Migration("20260703134427_InitialBaseDesign")]
     partial class InitialBaseDesign
     {
         /// <inheritdoc />
@@ -27,9 +27,8 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Document", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                    b.Property<string>("Id")
+                        .HasColumnType("text")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
@@ -41,7 +40,7 @@ namespace Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("edit_key_hash");
 
-                    b.Property<DateTime>("ExpireAt")
+                    b.Property<DateTime?>("ExpireAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expire_at");
 
@@ -59,6 +58,16 @@ namespace Persistence.Migrations
                         .HasName("pk_documents");
 
                     b.ToTable("documents", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "sample1",
+                            CreatedAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            EditKeyHash = "samplekey",
+                            ExpireAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Sample Document"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.Page", b =>
@@ -80,8 +89,9 @@ namespace Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid>("DocumentId")
-                        .HasColumnType("uuid")
+                    b.Property<string>("DocumentId")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("document_id");
 
                     b.Property<string>("PageName")
@@ -104,6 +114,26 @@ namespace Persistence.Migrations
                     b.ToTable("pages", null, t =>
                         {
                             t.HasCheckConstraint("CK_Page_PageNumber", "page_number > 0");
+                        });
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Content = "# A Title\n\nThis is the content of the first page.",
+                            CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DocumentId = "sample1",
+                            PageName = "Introduction",
+                            PageNumber = (short)1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Content = "- This is the content of the second page.",
+                            CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            DocumentId = "sample1",
+                            PageName = "Second Page",
+                            PageNumber = (short)2
                         });
                 });
 

@@ -10,6 +10,16 @@ public class Page
     public ushort PageNumber { get; set; }
 
 
-    public Guid DocumentId { get; set; }
-    public required Document Document { get; set; }
+    public required string DocumentId { get; set; }
+    public Document Document { get; set; } = null!;
+
+    public Page() { }
+
+    public Page(string pageName, string content, ushort pageNumber, string documentId)
+    {
+        PageName = pageName;
+        Content = content;
+        PageNumber = pageNumber;
+        DocumentId = documentId;
+    }
 }
