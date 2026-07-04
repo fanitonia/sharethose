@@ -1,0 +1,18 @@
+﻿using Application.Helpers;
+using Domain.Entities;
+
+namespace Application.Features.Documents.Extensions;
+
+internal static class DocumentExtensions
+{
+    public static bool IsDocumentExpired(this Document document)
+    {
+        return document.ExpireAt.HasValue && document.ExpireAt.Value <= DateTime.UtcNow;
+    }
+
+    public static bool IsEditKeyValid(this Document document, string editKey)
+    {
+        var editKeyHash = Sha256Hasher.ComputeHash(editKey);
+        return document.EditKeyHash == editKeyHash;
+    }
+}

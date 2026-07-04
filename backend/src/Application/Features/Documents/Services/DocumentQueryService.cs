@@ -1,4 +1,5 @@
 ﻿using Application.Features.Documents.DTOs.Responses;
+using Application.Features.Documents.Extensions;
 using Application.Features.Documents.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -17,7 +18,7 @@ public class DocumentQueryService(DatabaseContext context) : IDocumentQueryServi
 
         if (document != null)
         {
-            if (document.ExpireAt.HasValue && document.ExpireAt.Value <= DateTime.UtcNow)
+            if (document.IsDocumentExpired())
             {
                 context.Remove(document);
                 await context.SaveChangesAsync(ct);

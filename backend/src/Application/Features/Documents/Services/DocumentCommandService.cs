@@ -16,16 +16,17 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
         useNumbers: true, useSpecialCharacters: false, length: 15
     );
 
+    // TODO: custom editKey by user
+    // TODO: custom documentId by user
     public async Task<Result<(DocumentResponse document, string editKey)>> CreateDocumentAsync(CreateDocumentRequest request)
     {
         string documentId = ShortId.Generate(idOptions);
-        string editKey = Guid.NewGuid().ToString();
+        string editKey = ShortId.Generate(idOptions);
         string? passwordHash = request.Password is not null ? Sha256Hasher.ComputeHash(request.Password) : null;
 
         var document = new Document
         {
             Id = documentId,
-            CreatedAt = DateTime.UtcNow,
             ExpireAt = request.ExpireAt,
             Title = request.Title,
             EditKeyHash = Sha256Hasher.ComputeHash(editKey),
