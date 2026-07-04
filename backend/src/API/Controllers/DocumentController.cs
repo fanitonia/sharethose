@@ -1,4 +1,5 @@
-﻿using Application.Features.Documents.DTOs.Requests;
+﻿using API.Extensions;
+using Application.Features.Documents.DTOs.Requests;
 using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ namespace API.Controllers
 
             if (result.IsFailure)
             {
-                return BadRequest();
+                return result.ToProblemDetails(HttpContext);
             }
 
             return Ok(result.Value.document);

@@ -1,4 +1,5 @@
-﻿using Application.Common.Result;
+﻿using Application.Common.Errors;
+using Application.Common.Result;
 using Application.Features.Documents.DTOs.Requests;
 using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Interfaces;
@@ -39,7 +40,12 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
         };
 
         context.Documents.Add(document);
-        await context.SaveChangesAsync();
+        var result = await context.SaveChangesAsync();
+
+        if (result <= 0)
+        {
+            return CommonErrors.FailedToCreate;
+        }
 
         return (new DocumentResponse(document), editKey);
 
