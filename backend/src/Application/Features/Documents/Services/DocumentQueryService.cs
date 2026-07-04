@@ -15,6 +15,21 @@ public class DocumentQueryService(DatabaseContext context) : IDocumentQueryServi
             .Where(d => d.Id == documentId)
             .FirstOrDefaultAsync(ct);
 
-        return document is null ? null : new DocumentResponse(document);
+        if (document != null)
+        {
+            if (document.ExpireAt.HasValue && document.ExpireAt.Value <= DateTime.UtcNow)
+            {
+                context.Remove(document);
+                await context.SaveChangesAsync(ct);
+
+                return null;
+            }
+
+            document.Pages = document.Pages.OrderBy(p => p.PageNumber).ToList();
+
+            return new DocumentResponse(document);
+        }
+
+        return null;
     }
 }

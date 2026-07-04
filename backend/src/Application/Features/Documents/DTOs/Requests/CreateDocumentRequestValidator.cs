@@ -19,7 +19,7 @@ public class CreateDocumentRequestValidator : AbstractValidator<CreateDocumentRe
             .When(q => q.Password != null);
 
         RuleFor(q => q.ExpireAt)
-            .GreaterThan(DateTime.Now)
+            .GreaterThan(DateTime.UtcNow)
                 .WithMessage("Expire time must be a future date.");
 
         RuleFor(q => q.Pages)

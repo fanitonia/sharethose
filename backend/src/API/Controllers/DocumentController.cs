@@ -23,14 +23,15 @@ namespace API.Controllers
             return Ok(document);
         }
 
+        // TODO: return edit key also
         [HttpPost()]
-        public async Task<ActionResult<DocumentResponse?>> CreateDocument([FromBody] CreateDocumentRequest request)
+        public async Task<ActionResult<DocumentResponse>> CreateDocument([FromBody] CreateDocumentRequest request)
         {
             var result = await command.CreateDocumentAsync(request);
 
             if (result.IsFailure)
             {
-                return BadRequest(result.Error);
+                return BadRequest();
             }
 
             return Ok(result.Value.document);
