@@ -12,16 +12,16 @@ namespace API.Controllers
     {
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<DocumentResponse>> GetDocument([FromRoute] string id, CancellationToken ct)
+        public async Task<ActionResult<DocumentResponse>> GetDocument([FromRoute] string id, [FromQuery] string? password, CancellationToken ct)
         {
-            var document = await query.GetDocumentAsync(id, ct);
+            var result = await query.GetDocumentAsync(id, password, ct);
 
-            if (document == null)
+            if (result.IsFailure)
             {
-                return NotFound();
+                return result.ToProblemDetails(HttpContext);
             }
 
-            return Ok(document);
+            return Ok(result.Value);
         }
 
         [HttpPost()]

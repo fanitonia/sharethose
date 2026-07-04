@@ -15,4 +15,16 @@ internal static class DocumentExtensions
         var editKeyHash = Sha256Hasher.ComputeHash(editKey);
         return document.EditKeyHash == editKeyHash;
     }
+
+    public static bool IsPasswordValid(this Document document, string? password)
+    {
+        if (document.PasswordHash == null)
+            return true;
+
+        if (password == null)
+            return false;
+
+        var passwordHash = Sha256Hasher.ComputeHash(password);
+        return document.PasswordHash == passwordHash;
+    }
 }

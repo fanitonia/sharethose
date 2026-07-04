@@ -1,6 +1,9 @@
-﻿using Application.Features.Documents.DTOs.Responses;
+﻿using Application.Common.Errors;
+using Application.Common.Result;
+using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Extensions;
 using Application.Features.Documents.Interfaces;
+using Application.Features.Errors;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
@@ -8,7 +11,7 @@ namespace Application.Features.Documents.Services;
 
 public class DocumentQueryService(DatabaseContext context) : IDocumentQueryService
 {
-    public async Task<DocumentResponse?> GetDocumentAsync(string documentId, CancellationToken ct)
+    public async Task<Result<DocumentResponse>> GetDocumentAsync(string documentId, string? password, CancellationToken ct)
     {
         var document = await context.Documents
             .AsNoTracking()
@@ -16,21 +19,23 @@ public class DocumentQueryService(DatabaseContext context) : IDocumentQueryServi
             .Where(d => d.Id == documentId)
             .FirstOrDefaultAsync(ct);
 
-        if (document != null)
+        if (document == null)
+            return CommonErrors.NotFound;
+
+        if (document.IsDocumentExpired())
         {
-            if (document.IsDocumentExpired())
-            {
-                context.Remove(document);
-                await context.SaveChangesAsync(ct);
+            context.Remove(document);
+            await context.SaveChangesAsync(ct);
 
-                return null;
-            }
-
-            document.Pages = document.Pages.OrderBy(p => p.PageNumber).ToList();
-
-            return new DocumentResponse(document);
+            return DocumentErrors.Expired;
         }
 
-        return null;
+        if (!document.IsPasswordValid(password))
+            return DocumentErrors.InvalidPassword;
+
+        document.Pages = document.Pages.OrderBy(p => p.PageNumber).ToList();
+
+        return new DocumentResponse(document);
+
     }
 }
