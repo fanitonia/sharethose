@@ -1,5 +1,4 @@
-﻿using Application.Features.Documents.DTOs.Objects;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Application.Features.Documents.DTOs.Requests;
 
@@ -19,7 +18,7 @@ public class UpdateDocumentRequestValidator : AbstractValidator<UpdateDocumentRe
             .When(q => q != null);
 
         RuleFor(q => q.ExpireAt)
-            .GreaterThan(DateTime.Now)
+            .GreaterThan(DateTime.UtcNow)
                 .WithMessage("Expire time must be a future date.");
 
         RuleFor(q => q.Pages)
@@ -27,6 +26,6 @@ public class UpdateDocumentRequestValidator : AbstractValidator<UpdateDocumentRe
                 .WithMessage("At least one page is required.");
 
         RuleForEach(q => q.Pages)
-            .SetValidator(new PageObjectValidator());
+            .SetValidator(new UpdatePageValidator());
     }
 }

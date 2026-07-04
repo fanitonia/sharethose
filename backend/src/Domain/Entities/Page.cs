@@ -4,6 +4,7 @@ public class Page
 {
     public int Id { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public required string PageName { get; set; }
     public required string Content { get; set; }

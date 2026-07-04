@@ -51,6 +51,10 @@ namespace Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("title");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
                     b.HasKey("Id")
                         .HasName("pk_documents");
 
@@ -60,10 +64,11 @@ namespace Persistence.Migrations
                         new
                         {
                             Id = "sample1",
-                            CreatedAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EditKeyHash = "samplekey",
-                            ExpireAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Title = "Sample Document"
+                            ExpireAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Title = "Sample Document",
+                            UpdatedAt = new DateTime(2026, 7, 2, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -101,6 +106,10 @@ namespace Persistence.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("page_number");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
                     b.HasKey("Id")
                         .HasName("pk_pages");
 
@@ -121,7 +130,8 @@ namespace Persistence.Migrations
                             CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentId = "sample1",
                             PageName = "Introduction",
-                            PageNumber = (short)1
+                            PageNumber = (short)1,
+                            UpdatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
@@ -130,7 +140,8 @@ namespace Persistence.Migrations
                             CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentId = "sample1",
                             PageName = "Second Page",
-                            PageNumber = (short)2
+                            PageNumber = (short)2,
+                            UpdatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });
 

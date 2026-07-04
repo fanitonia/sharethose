@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
 
-namespace Application.Features.Documents.DTOs.Objects;
+namespace Application.Features.Documents.DTOs.Requests;
 
-public class PageObjectValidator : AbstractValidator<PageObject>
+public class UpdatePageValidator : AbstractValidator<UpdatePageRequest>
 {
-    public PageObjectValidator()
+    public UpdatePageValidator()
     {
         RuleFor(q => q.PageName)
             .NotEmpty()

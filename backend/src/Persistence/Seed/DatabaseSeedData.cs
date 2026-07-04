@@ -13,8 +13,9 @@ internal static class DatabaseSeedData
                 Id = "sample1",
                 Title = "Sample Document",
                 EditKeyHash = "samplekey",
-                ExpireAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                CreatedAt = new DateTime(2026, 8, 1, 0, 0, 0, DateTimeKind.Utc),
+                ExpireAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                UpdatedAt = new DateTime(2026, 7, 2, 0, 0, 0, 0, DateTimeKind.Utc)
             }
         );
 
@@ -27,6 +28,7 @@ internal static class DatabaseSeedData
                Content = "# A Title\n\nThis is the content of the first page.",
                PageNumber = 1,
                CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+               UpdatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc)
            },
            new Page
            {
@@ -36,6 +38,7 @@ internal static class DatabaseSeedData
                Content = "- This is the content of the second page.",
                PageNumber = 2,
                CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+               UpdatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc)
            }
         );
 

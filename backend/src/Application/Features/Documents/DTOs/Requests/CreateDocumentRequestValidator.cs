@@ -1,5 +1,4 @@
-﻿using Application.Features.Documents.DTOs.Objects;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Application.Features.Documents.DTOs.Requests;
 
@@ -27,6 +26,6 @@ public class CreateDocumentRequestValidator : AbstractValidator<CreateDocumentRe
                 .WithMessage("At least one page is required.");
 
         RuleForEach(q => q.Pages)
-            .SetValidator(new PageObjectValidator());
+            .SetValidator(new UpdatePageValidator());
     }
 }
