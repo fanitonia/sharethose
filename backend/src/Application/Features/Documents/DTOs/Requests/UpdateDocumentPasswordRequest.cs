@@ -2,4 +2,5 @@
 
 public class UpdateDocumentPasswordRequest
 {
+    public string? Password { get; set; }
 }

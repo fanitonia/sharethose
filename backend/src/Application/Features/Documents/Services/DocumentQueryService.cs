@@ -33,7 +33,6 @@ public class DocumentQueryService(DatabaseContext context) : IDocumentQueryServi
         if (!document.IsPasswordValid(password))
             return DocumentErrors.InvalidPassword;
 
-        // PageNumber is no longer DB-unique, so Id is used as a tiebreaker for a stable order.
         document.Pages = document.Pages.OrderBy(p => p.PageNumber).ThenBy(p => p.Id).ToList();
 
         return new DocumentResponse(document);

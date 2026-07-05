@@ -41,6 +41,19 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
         });
     }
 
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteDocument([FromRoute] string id, [FromQuery] string editKey)
+    {
+        var result = await command.DeleteDocumentAsync(id, editKey);
+
+        if (result.IsFailure)
+        {
+            return result.ToProblemDetails(HttpContext);
+        }
+
+        return NoContent();
+    }
+
     [HttpPut("{id}")]
     public async Task<ActionResult<DocumentResponse>> UpdateDocumentData([FromBody] UpdateDocumentContentRequest request, [FromRoute] string id, [FromQuery] string editKey)
     {
@@ -54,10 +67,23 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
         return Ok(result.Value);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteDocument([FromRoute] string id, [FromQuery] string editKey)
+    [HttpPatch("{id}/expire-date")]
+    public async Task<ActionResult<DocumentResponse>> UpdateDocumentExpireDate([FromBody] UpdateDocumentExpireDateRequest request, [FromRoute] string id, [FromQuery] string editKey)
     {
-        var result = await command.DeleteDocumentAsync(id, editKey);
+        var result = await command.UpdateDocumentExpireDateAsync(request, id, editKey);
+
+        if (result.IsFailure)
+        {
+            return result.ToProblemDetails(HttpContext);
+        }
+
+        return Ok(result.Value);
+    }
+
+    [HttpPatch("{id}/password")]
+    public async Task<ActionResult> UpdateDocumentPassword([FromBody] UpdateDocumentPasswordRequest request, [FromRoute] string id, [FromQuery] string editKey)
+    {
+        var result = await command.UpdateDocumentPasswordAsync(request, id, editKey);
 
         if (result.IsFailure)
         {

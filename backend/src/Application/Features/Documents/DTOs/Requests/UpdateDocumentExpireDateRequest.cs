@@ -2,4 +2,5 @@
 
 public class UpdateDocumentExpireDateRequest
 {
+    public DateTime? ExpireAt { get; set; }
 }

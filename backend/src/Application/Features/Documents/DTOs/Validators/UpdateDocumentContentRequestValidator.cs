@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace Application.Features.Documents.DTOs.Validators;
 
-public class UpdateDocumentRequestValidator : AbstractValidator<UpdateDocumentContentRequest>
+public class UpdateDocumentContentRequestValidator : AbstractValidator<UpdateDocumentContentRequest>
 {
-    public UpdateDocumentRequestValidator()
+    public UpdateDocumentContentRequestValidator()
     {
         RuleFor(q => q.Title)
             .NotEmpty()

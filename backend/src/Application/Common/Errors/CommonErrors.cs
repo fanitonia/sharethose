@@ -8,4 +8,5 @@ public static class CommonErrors
     public static Error FailedToDelete => new("Failed to delete", "Something went wrong while deleting.", 500);
     public static Error FailedToUpdate => new("Failed to update", "Something went wrong while updating.", 500);
     public static Error NotFound => new("Not found", "The requested resource was not found.", 404);
+    public static Error InvalidInput => new("Invalid input", "The provided input is invalid.", 400);
 }

@@ -182,11 +182,64 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
 
     public async Task<Result<DocumentResponse>> UpdateDocumentExpireDateAsync(UpdateDocumentExpireDateRequest request, string documentId, string editKey)
     {
-        throw new NotImplementedException();
+        var document = await context.Documents.Include(d => d.Pages).FirstOrDefaultAsync(d => d.Id == documentId);
+
+        if (document == null)
+            return CommonErrors.NotFound;
+
+        if (!document.IsEditKeyValid(editKey))
+            return DocumentErrors.InvalidEditKey;
+
+        if (document.ExpireAt == request.ExpireAt)
+            return DocumentErrors.NoChangesFound;
+
+        if (request.ExpireAt.HasValue && request.ExpireAt.Value <= DateTime.UtcNow)
+            return CommonErrors.InvalidInput;
+
+        document.ExpireAt = request.ExpireAt;
+        document.UpdatedAt = DateTime.UtcNow;
+
+        var result = await context.SaveChangesAsync();
+
+        if (result <= 0)
+            return CommonErrors.FailedToUpdate;
+
+        return new DocumentResponse(document);
     }
 
-    public async Task<Result<DocumentResponse>> UpdateDocumentPasswordAsync(UpdateDocumentPasswordRequest request, string documentId, string editKey)
+    public async Task<Result> UpdateDocumentPasswordAsync(UpdateDocumentPasswordRequest request, string documentId, string editKey)
     {
-        throw new NotImplementedException();
+        var document = await context.Documents.FindAsync(documentId);
+
+        if (document == null)
+            return CommonErrors.NotFound;
+
+        if (!document.IsEditKeyValid(editKey))
+            return DocumentErrors.InvalidEditKey;
+
+        if (request.Password is null)
+        {
+            if (document.PasswordHash is null)
+                return DocumentErrors.NoChangesFound;
+
+            document.PasswordHash = null;
+            document.UpdatedAt = DateTime.UtcNow;
+            await context.SaveChangesAsync();
+
+            return Result.Success();
+        }
+
+        if (document.PasswordHash == Sha256Hasher.ComputeHash(request.Password))
+            return DocumentErrors.NoChangesFound;
+
+        document.PasswordHash = Sha256Hasher.ComputeHash(request.Password);
+        document.UpdatedAt = DateTime.UtcNow;
+
+        var result = await context.SaveChangesAsync();
+
+        if (result <= 0)
+            return CommonErrors.FailedToUpdate;
+
+        return Result.Success();
     }
 }
