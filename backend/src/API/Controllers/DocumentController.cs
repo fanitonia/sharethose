@@ -4,54 +4,66 @@ using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
-namespace API.Controllers
+namespace API.Controllers;
+
+[Route("api/document")]
+[ApiController]
+public class DocumentController(IDocumentQueryService query, IDocumentCommandService command) : ControllerBase
 {
-    [Route("api/document")]
-    [ApiController]
-    public class DocumentController(IDocumentQueryService query, IDocumentCommandService command) : ControllerBase
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<DocumentResponse>> GetDocument([FromRoute] string id, [FromQuery] string? password, CancellationToken ct)
     {
+        var result = await query.GetDocumentAsync(id, password, ct);
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<DocumentResponse>> GetDocument([FromRoute] string id, [FromQuery] string? password, CancellationToken ct)
+        if (result.IsFailure)
         {
-            var result = await query.GetDocumentAsync(id, password, ct);
-
-            if (result.IsFailure)
-            {
-                return result.ToProblemDetails(HttpContext);
-            }
-
-            return Ok(result.Value);
+            return result.ToProblemDetails(HttpContext);
         }
 
-        [HttpPost]
-        public async Task<ActionResult<DocumentResponseWithEditKey>> CreateDocument([FromBody] CreateDocumentRequest request)
+        return Ok(result.Value);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<DocumentResponseWithEditKey>> CreateDocument([FromBody] CreateDocumentRequest request)
+    {
+        var result = await command.CreateDocumentAsync(request);
+
+        if (result.IsFailure)
         {
-            var result = await command.CreateDocumentAsync(request);
-
-            if (result.IsFailure)
-            {
-                return result.ToProblemDetails(HttpContext);
-            }
-
-            return Ok(new DocumentResponseWithEditKey
-            {
-                Document = result.Value.document,
-                EditKey = result.Value.editKey
-            });
+            return result.ToProblemDetails(HttpContext);
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<DocumentResponse>> UpdateDocumentData([FromBody] UpdateDocumentContentRequest request, [FromRoute] string id, [FromQuery] string editKey)
+        return Ok(new DocumentResponseWithEditKey
         {
-            var result = await command.UpdateDocumentContentAsync(request, id, editKey);
+            Document = result.Value.document,
+            EditKey = result.Value.editKey
+        });
+    }
 
-            if (result.IsFailure)
-            {
-                return result.ToProblemDetails(HttpContext);
-            }
+    [HttpPut("{id}")]
+    public async Task<ActionResult<DocumentResponse>> UpdateDocumentData([FromBody] UpdateDocumentContentRequest request, [FromRoute] string id, [FromQuery] string editKey)
+    {
+        var result = await command.UpdateDocumentContentAsync(request, id, editKey);
 
-            return Ok(result.Value);
+        if (result.IsFailure)
+        {
+            return result.ToProblemDetails(HttpContext);
         }
+
+        return Ok(result.Value);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteDocument([FromRoute] string id, [FromQuery] string editKey)
+    {
+        var result = await command.DeleteDocumentAsync(id, editKey);
+
+        if (result.IsFailure)
+        {
+            return result.ToProblemDetails(HttpContext);
+        }
+
+        return NoContent();
     }
 }

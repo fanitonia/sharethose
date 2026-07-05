@@ -2,9 +2,9 @@
 using Application.Common.Result;
 using Application.Features.Documents.DTOs.Requests;
 using Application.Features.Documents.DTOs.Responses;
+using Application.Features.Documents.Errors;
 using Application.Features.Documents.Extensions;
 using Application.Features.Documents.Interfaces;
-using Application.Features.Errors;
 using Application.Helpers;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -55,14 +55,22 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
 
     }
 
-    public Task<Result> DeleteDocumentAsync(string documentId)
+    public async Task<Result> DeleteDocumentAsync(string documentId, string? editKey = null)
     {
-        throw new NotImplementedException();
-    }
+        var document = await context.Documents.FindAsync(documentId);
+        if (document is null)
+            return CommonErrors.NotFound;
 
-    public Task<Result> DeleteDocumentAsync(string documentId, string editKey)
-    {
-        throw new NotImplementedException();
+        if (editKey is not null && !document.IsEditKeyValid(editKey))
+            return DocumentErrors.InvalidEditKey;
+
+        context.Documents.Remove(document);
+        var result = await context.SaveChangesAsync();
+
+        if (result <= 0)
+            return CommonErrors.FailedToDelete;
+
+        return Result.Success();
     }
 
     // TODO: if only page number changed, do not update the page updatedAt, only update the document updatedAt. 

@@ -1,9 +1,9 @@
 ﻿using Application.Common.Errors;
 using Application.Common.Result;
 using Application.Features.Documents.DTOs.Responses;
+using Application.Features.Documents.Errors;
 using Application.Features.Documents.Extensions;
 using Application.Features.Documents.Interfaces;
-using Application.Features.Errors;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 

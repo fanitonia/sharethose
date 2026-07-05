@@ -1,6 +1,6 @@
 ﻿using Application.Common.Result;
 
-namespace Application.Features.Errors;
+namespace Application.Features.Documents.Errors;
 
 public static class DocumentErrors
 {
