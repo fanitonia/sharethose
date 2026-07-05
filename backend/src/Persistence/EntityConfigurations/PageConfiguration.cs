@@ -20,10 +20,6 @@ internal class PageConfiguration : IEntityTypeConfiguration<Page>
             .HasColumnType("smallint")
             .IsRequired();
 
-        entity
-            .HasIndex(p => new { p.DocumentId, p.PageNumber })
-            .IsUnique();
-
         entity.ToTable(t => t.HasCheckConstraint("CK_Page_PageNumber", "page_number > 0"));
     }
 

@@ -12,8 +12,8 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20260704110234_InitialBaseDesign")]
-    partial class InitialBaseDesign
+    [Migration("20260705092846_InitialBaseMigration")]
+    partial class InitialBaseMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -116,9 +116,8 @@ namespace Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_pages");
 
-                    b.HasIndex("DocumentId", "PageNumber")
-                        .IsUnique()
-                        .HasDatabaseName("ix_pages_document_id_page_number");
+                    b.HasIndex("DocumentId")
+                        .HasDatabaseName("ix_pages_document_id");
 
                     b.ToTable("pages", null, t =>
                         {

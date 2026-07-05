@@ -1,10 +1,11 @@
-﻿using FluentValidation;
+﻿using Application.Features.Documents.DTOs.Requests;
+using FluentValidation;
 
-namespace Application.Features.Documents.DTOs.Requests;
+namespace Application.Features.Documents.DTOs.Validators;
 
-public class UpdatePageValidator : AbstractValidator<UpdatePageRequest>
+public class UpdatePageRequestValidator : AbstractValidator<UpdatePageRequest>
 {
-    public UpdatePageValidator()
+    public UpdatePageRequestValidator()
     {
         RuleFor(q => q.PageName)
             .NotEmpty()

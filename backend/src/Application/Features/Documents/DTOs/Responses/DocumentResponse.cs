@@ -29,6 +29,7 @@ public class DocumentResponse
         ExpireAt = document.ExpireAt;
         Pages = document.Pages.Select(p => new PageResponse
         {
+            Id = p.Id,
             CreatedAt = p.CreatedAt,
             UpdatedAt = p.UpdatedAt,
             PageName = p.PageName,

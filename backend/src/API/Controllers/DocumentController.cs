@@ -24,7 +24,7 @@ namespace API.Controllers
             return Ok(result.Value);
         }
 
-        [HttpPost()]
+        [HttpPost]
         public async Task<ActionResult<DocumentResponseWithEditKey>> CreateDocument([FromBody] CreateDocumentRequest request)
         {
             var result = await command.CreateDocumentAsync(request);
@@ -39,6 +39,19 @@ namespace API.Controllers
                 Document = result.Value.document,
                 EditKey = result.Value.editKey
             });
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<DocumentResponse>> UpdateDocumentData([FromBody] UpdateDocumentContentRequest request, [FromRoute] string id, [FromQuery] string editKey)
+        {
+            var result = await command.UpdateDocumentContentAsync(request, id, editKey);
+
+            if (result.IsFailure)
+            {
+                return result.ToProblemDetails(HttpContext);
+            }
+
+            return Ok(result.Value);
         }
     }
 }

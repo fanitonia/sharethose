@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialBaseDesign : Migration
+    public partial class InitialBaseMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -70,10 +70,9 @@ namespace Persistence.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_pages_document_id_page_number",
+                name: "ix_pages_document_id",
                 table: "pages",
-                columns: new[] { "document_id", "page_number" },
-                unique: true);
+                column: "document_id");
         }
 
         /// <inheritdoc />
