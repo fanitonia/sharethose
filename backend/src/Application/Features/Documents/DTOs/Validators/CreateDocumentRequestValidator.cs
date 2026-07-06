@@ -27,6 +27,6 @@ public class CreateDocumentRequestValidator : AbstractValidator<CreateDocumentRe
                 .WithMessage("At least one page is required.");
 
         RuleForEach(q => q.Pages)
-            .SetValidator(new UpdatePageRequestValidator());
+            .SetValidator(new CreatePageRequestValidator());
     }
 }
