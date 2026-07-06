@@ -22,7 +22,7 @@ export default defineConfig({
       "@assets": path.resolve(__dirname, "./src/assets"),
       "@components": path.resolve(__dirname, "./src/components"),
       "@lib": path.resolve(__dirname, "./src/lib"),
-      "@stores": path.resolve(__dirname, "./src/stores"),
+      "@context": path.resolve(__dirname, "./src/context"),
       "@type": path.resolve(__dirname, "./src/types"),
       "@utils": path.resolve(__dirname, "./src/utils"),
       "@hooks": path.resolve(__dirname, "./src/hooks"),

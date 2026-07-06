@@ -1,13 +1,14 @@
-import "./index.css";
-import { QueryClient } from "@tanstack/react-query";
-
-import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
+
+import { QueryClient } from "@tanstack/react-query";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 
-import { ThemeProvider } from "./components/theme-provider";
+import { ThemeProvider } from "@context/ThemeProvider";
+
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import "./styles/index.css";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,6 @@ if (!rootElement.innerHTML) {
       <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
         <RouterProvider router={router} />
       </ThemeProvider>
-    </StrictMode>,
+    </StrictMode>
   );
 }
