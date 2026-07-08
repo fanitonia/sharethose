@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
 
-[Route("api/document")]
+[Route("api/documents")]
 [ApiController]
 public class DocumentController(IDocumentQueryService query, IDocumentCommandService command) : ControllerBase
 {
