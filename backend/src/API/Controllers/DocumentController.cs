@@ -11,10 +11,10 @@ namespace API.Controllers;
 public class DocumentController(IDocumentQueryService query, IDocumentCommandService command) : ControllerBase
 {
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<DocumentResponse>> GetDocument([FromRoute] string id, [FromQuery] string? password, CancellationToken ct)
+    [HttpGet("{slug}")]
+    public async Task<ActionResult<DocumentResponse>> GetDocument([FromRoute] string slug, [FromQuery] string? password, CancellationToken ct)
     {
-        var result = await query.GetDocumentAsync(id, password, ct);
+        var result = await query.GetDocumentAsync(slug, password, ct);
 
         if (result.IsFailure)
         {

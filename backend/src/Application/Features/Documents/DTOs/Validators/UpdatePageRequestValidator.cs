@@ -7,11 +7,17 @@ public class UpdatePageRequestValidator : AbstractValidator<UpdatePageRequest>
 {
     public UpdatePageRequestValidator()
     {
-        RuleFor(q => q.PageName)
+        RuleFor(q => q.Name)
             .NotEmpty()
                 .WithMessage("Page name is required.")
             .MaximumLength(50)
                 .WithMessage("Page name must not exceed 50 characters.");
+
+        RuleFor(q => q.Slug)
+            .MaximumLength(50)
+                .WithMessage("Slug must not exceed 50 characters.")
+            .Matches("^[a-zA-Z0-9-]*$")
+                .WithMessage("Slug can only contain numbers, english letters, and hyphens.");
 
         RuleFor(q => q.Content)
             .NotEmpty()

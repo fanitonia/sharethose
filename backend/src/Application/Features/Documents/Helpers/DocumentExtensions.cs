@@ -1,7 +1,7 @@
 ﻿using Application.Helpers;
 using Domain.Entities;
 
-namespace Application.Features.Documents.Extensions;
+namespace Application.Features.Documents.Helpers;
 
 internal static class DocumentExtensions
 {

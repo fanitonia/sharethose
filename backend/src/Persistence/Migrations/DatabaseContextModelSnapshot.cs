@@ -45,6 +45,11 @@ namespace Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("password_hash");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("slug");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -58,6 +63,10 @@ namespace Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_documents");
 
+                    b.HasIndex("Slug")
+                        .IsUnique()
+                        .HasDatabaseName("ix_documents_slug");
+
                     b.ToTable("documents", (string)null);
 
                     b.HasData(
@@ -67,6 +76,7 @@ namespace Persistence.Migrations
                             CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EditKeyHash = "samplekey",
                             ExpireAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Slug = "sample-document",
                             Title = "Sample Document",
                             UpdatedAt = new DateTime(2026, 7, 2, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -96,15 +106,20 @@ namespace Persistence.Migrations
                         .HasColumnType("text")
                         .HasColumnName("document_id");
 
-                    b.Property<string>("PageName")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("page_name");
+                        .HasColumnName("name");
 
                     b.Property<short>("PageNumber")
                         .HasColumnType("smallint")
                         .HasColumnName("page_number");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("slug");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -128,8 +143,9 @@ namespace Persistence.Migrations
                             Content = "# A Title\n\nThis is the content of the first page.",
                             CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentId = "sample1",
-                            PageName = "Introduction",
+                            Name = "Introduction",
                             PageNumber = (short)1,
+                            Slug = "introduction",
                             UpdatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
                         new
@@ -138,8 +154,9 @@ namespace Persistence.Migrations
                             Content = "- This is the content of the second page.",
                             CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             DocumentId = "sample1",
-                            PageName = "Second Page",
+                            Name = "Second Page",
                             PageNumber = (short)2,
+                            Slug = "second-page",
                             UpdatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
                 });

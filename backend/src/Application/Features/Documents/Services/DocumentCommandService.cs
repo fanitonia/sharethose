@@ -3,7 +3,7 @@ using Application.Common.Result;
 using Application.Features.Documents.DTOs.Requests;
 using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Errors;
-using Application.Features.Documents.Extensions;
+using Application.Features.Documents.Helpers;
 using Application.Features.Documents.Interfaces;
 using Application.Helpers;
 using Domain.Entities;
@@ -13,35 +13,45 @@ using shortid;
 
 namespace Application.Features.Documents.Services;
 
-public class DocumentCommandService(DatabaseContext context) : IDocumentCommandService
+public class DocumentCommandService(DatabaseContext context, IDocumentQueryService query) : IDocumentCommandService
 {
     ShortIdOptions idOptions = new ShortIdOptions(
         useNumbers: true, useSpecialCharacters: false, length: 15
     );
 
     // TODO: custom editKey by user
-    // TODO: custom documentId by user
     public async Task<Result<(DocumentResponse document, string editKey)>> CreateDocumentAsync(CreateDocumentRequest request)
     {
-        string documentId = ShortId.Generate(idOptions);
+        if (request.Slug is not null && await query.IsDocumentExistsAsync(request.Slug, CancellationToken.None))
+        {
+            return DocumentErrors.SlugAlreadyExists;
+        }
+
+        string documentId = Guid.NewGuid().ToString();
+        string slug = request.Slug ?? ShortId.Generate(idOptions);
         string editKey = ShortId.Generate(idOptions);
         string? passwordHash = request.Password is not null ? Sha256Hasher.ComputeHash(request.Password) : null;
 
         var document = new Document
         {
             Id = documentId,
+            Slug = slug,
             ExpireAt = request.ExpireAt,
             Title = request.Title,
             EditKeyHash = Sha256Hasher.ComputeHash(editKey),
             PasswordHash = passwordHash,
             Pages = request.Pages.Select(p => new Page
             {
-                PageName = p.PageName,
+                Name = p.Name,
+                Slug = p.Slug ?? GenerateSlug(p.Name),
                 Content = p.Content,
                 PageNumber = p.PageNumber,
                 DocumentId = documentId
             }).ToList()
         };
+
+        var reorderedPages = ReorderPages(document.Pages.ToArray());
+        document.Pages = reorderedPages;
 
         context.Documents.Add(document);
         var result = await context.SaveChangesAsync();
@@ -112,9 +122,15 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
             {
                 var pageChanged = false;
 
-                if (existingPage.PageName != pageRequest.PageName)
+                if (existingPage.Name != pageRequest.Name)
                 {
-                    existingPage.PageName = pageRequest.PageName;
+                    existingPage.Name = pageRequest.Name;
+                    pageChanged = true;
+                }
+
+                if (existingPage.Slug != pageRequest.Slug)
+                {
+                    existingPage.Slug = pageRequest.Slug ?? GenerateSlug(pageRequest.Name);
                     pageChanged = true;
                 }
 
@@ -130,6 +146,8 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
                     pageChanged = true;
                 }
 
+
+
                 if (pageChanged)
                 {
                     existingPage.UpdatedAt = DateTime.UtcNow;
@@ -141,7 +159,8 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
                 // request page Id is null means a new page
                 document.Pages.Add(new Page
                 {
-                    PageName = pageRequest.PageName,
+                    Name = pageRequest.Name,
+                    Slug = pageRequest.Slug ?? GenerateSlug(pageRequest.Name),
                     Content = pageRequest.Content,
                     PageNumber = pageRequest.PageNumber,
                     DocumentId = documentId
@@ -152,18 +171,7 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
         }
 
         // Reorder pages to ensure consistent ordering
-        var orderedPages = document.Pages
-            .OrderBy(p => p.PageNumber)
-            .ThenBy(p => p.Id)
-            .ToList();
-
-        for (var i = 0; i < orderedPages.Count; i++)
-        {
-            var expectedPageNumber = (ushort)(i + 1);
-
-            if (orderedPages[i].PageNumber != expectedPageNumber)
-                orderedPages[i].PageNumber = expectedPageNumber;
-        }
+        var orderedPages = ReorderPages(document.Pages.ToArray());
 
         document.Pages = orderedPages;
 
@@ -241,5 +249,26 @@ public class DocumentCommandService(DatabaseContext context) : IDocumentCommandS
             return CommonErrors.FailedToUpdate;
 
         return Result.Success();
+    }
+
+    private List<Page> ReorderPages(Page[] pages)
+    {
+        var orderedPages = pages
+            .OrderBy(p => p.PageNumber)
+            .ThenBy(p => p.Id)
+            .ToList();
+        for (var i = 0; i < orderedPages.Count; i++)
+        {
+            var expectedPageNumber = (ushort)(i + 1);
+            if (orderedPages[i].PageNumber != expectedPageNumber)
+                orderedPages[i].PageNumber = expectedPageNumber;
+        }
+        return orderedPages;
+    }
+
+    private string GenerateSlug(string title)
+    {
+        var slug = title.ToLower().Trim().Replace(" ", "-").Normalize();
+        return slug;
     }
 }

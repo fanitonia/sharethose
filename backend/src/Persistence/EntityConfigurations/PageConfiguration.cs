@@ -8,7 +8,7 @@ internal class PageConfiguration : IEntityTypeConfiguration<Page>
 {
     public void Configure(EntityTypeBuilder<Page> entity)
     {
-        entity.Property(p => p.PageName)
+        entity.Property(p => p.Name)
             .HasMaxLength(50)
             .IsRequired();
 

@@ -12,6 +12,7 @@ internal static class DatabaseSeedData
             {
                 Id = "sample1",
                 Title = "Sample Document",
+                Slug = "sample-document",
                 EditKeyHash = "samplekey",
                 ExpireAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                 CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -23,7 +24,8 @@ internal static class DatabaseSeedData
            new Page
            {
                Id = 1,
-               PageName = "Introduction",
+               Name = "Introduction",
+               Slug = "introduction",
                DocumentId = "sample1",
                Content = "# A Title\n\nThis is the content of the first page.",
                PageNumber = 1,
@@ -33,7 +35,8 @@ internal static class DatabaseSeedData
            new Page
            {
                Id = 2,
-               PageName = "Second Page",
+               Name = "Second Page",
+               Slug = "second-page",
                DocumentId = "sample1",
                Content = "- This is the content of the second page.",
                PageNumber = 2,

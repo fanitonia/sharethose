@@ -13,6 +13,13 @@ public class CreateDocumentRequestValidator : AbstractValidator<CreateDocumentRe
             .MaximumLength(100)
                 .WithMessage("Title must not exceed 100 characters.");
 
+        RuleFor(q => q.Slug)
+            .MaximumLength(50)
+                .WithMessage("Slug must not exceed 50 characters.")
+            .Matches("^[a-zA-Z0-9-]*$")
+                .WithMessage("Custom slug can only contain numbers, english letters, and hyphens.")
+            .When(q => !string.IsNullOrEmpty(q.Slug));
+
         RuleFor(q => q.Password)
             .NotEmpty()
                 .WithMessage("Password can't be empty.")

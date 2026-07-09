@@ -5,5 +5,6 @@ namespace Application.Features.Documents.Interfaces;
 
 public interface IDocumentQueryService
 {
-    public Task<Result<DocumentResponse>> GetDocumentAsync(string documentId, string? password, CancellationToken ct);
+    public Task<Result<DocumentResponse>> GetDocumentAsync(string documentSlug, string? password, CancellationToken ct);
+    public Task<bool> IsDocumentExistsAsync(string documentSlug, CancellationToken ct);
 }

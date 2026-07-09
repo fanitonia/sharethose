@@ -11,5 +11,8 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
         entity.Property(p => p.Title)
             .HasMaxLength(100)
             .IsRequired();
+
+        entity.HasIndex(p => p.Slug)
+            .IsUnique();
     }
 }

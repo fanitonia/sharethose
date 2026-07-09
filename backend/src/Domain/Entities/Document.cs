@@ -6,6 +6,7 @@ public class Document
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+    public required string Slug { get; set; }
     public required string Title { get; set; }
     public required string EditKeyHash { get; set; }
     public string? PasswordHash { get; set; }
