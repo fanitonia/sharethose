@@ -10,43 +10,69 @@
 
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as IndexRouteImport } from "./routes/index"
-import { Route as DocDocumentIdRouteImport } from "./routes/doc/$documentId"
+import { Route as DocDocumentIdRouteRouteImport } from "./routes/doc/$documentId/route"
+import { Route as DocDocumentIdIndexRouteImport } from "./routes/doc/$documentId/index"
+import { Route as DocDocumentIdPageNameRouteImport } from "./routes/doc/$documentId/$pageName"
 
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocDocumentIdRoute = DocDocumentIdRouteImport.update({
+const DocDocumentIdRouteRoute = DocDocumentIdRouteRouteImport.update({
   id: "/doc/$documentId",
   path: "/doc/$documentId",
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocDocumentIdIndexRoute = DocDocumentIdIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => DocDocumentIdRouteRoute,
+} as any)
+const DocDocumentIdPageNameRoute = DocDocumentIdPageNameRouteImport.update({
+  id: "/$pageName",
+  path: "/$pageName",
+  getParentRoute: () => DocDocumentIdRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
-  "/doc/$documentId": typeof DocDocumentIdRoute
+  "/doc/$documentId": typeof DocDocumentIdRouteRouteWithChildren
+  "/doc/$documentId/$pageName": typeof DocDocumentIdPageNameRoute
+  "/doc/$documentId/": typeof DocDocumentIdIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
-  "/doc/$documentId": typeof DocDocumentIdRoute
+  "/doc/$documentId/$pageName": typeof DocDocumentIdPageNameRoute
+  "/doc/$documentId": typeof DocDocumentIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
-  "/doc/$documentId": typeof DocDocumentIdRoute
+  "/doc/$documentId": typeof DocDocumentIdRouteRouteWithChildren
+  "/doc/$documentId/$pageName": typeof DocDocumentIdPageNameRoute
+  "/doc/$documentId/": typeof DocDocumentIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/" | "/doc/$documentId"
+  fullPaths:
+    | "/"
+    | "/doc/$documentId"
+    | "/doc/$documentId/$pageName"
+    | "/doc/$documentId/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/doc/$documentId"
-  id: "__root__" | "/" | "/doc/$documentId"
+  to: "/" | "/doc/$documentId/$pageName" | "/doc/$documentId"
+  id:
+    | "__root__"
+    | "/"
+    | "/doc/$documentId"
+    | "/doc/$documentId/$pageName"
+    | "/doc/$documentId/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DocDocumentIdRoute: typeof DocDocumentIdRoute
+  DocDocumentIdRouteRoute: typeof DocDocumentIdRouteRouteWithChildren
 }
 
 declare module "@tanstack/react-router" {
@@ -62,15 +88,42 @@ declare module "@tanstack/react-router" {
       id: "/doc/$documentId"
       path: "/doc/$documentId"
       fullPath: "/doc/$documentId"
-      preLoaderRoute: typeof DocDocumentIdRouteImport
+      preLoaderRoute: typeof DocDocumentIdRouteRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    "/doc/$documentId/": {
+      id: "/doc/$documentId/"
+      path: "/"
+      fullPath: "/doc/$documentId/"
+      preLoaderRoute: typeof DocDocumentIdIndexRouteImport
+      parentRoute: typeof DocDocumentIdRouteRoute
+    }
+    "/doc/$documentId/$pageName": {
+      id: "/doc/$documentId/$pageName"
+      path: "/$pageName"
+      fullPath: "/doc/$documentId/$pageName"
+      preLoaderRoute: typeof DocDocumentIdPageNameRouteImport
+      parentRoute: typeof DocDocumentIdRouteRoute
     }
   }
 }
 
+interface DocDocumentIdRouteRouteChildren {
+  DocDocumentIdPageNameRoute: typeof DocDocumentIdPageNameRoute
+  DocDocumentIdIndexRoute: typeof DocDocumentIdIndexRoute
+}
+
+const DocDocumentIdRouteRouteChildren: DocDocumentIdRouteRouteChildren = {
+  DocDocumentIdPageNameRoute: DocDocumentIdPageNameRoute,
+  DocDocumentIdIndexRoute: DocDocumentIdIndexRoute,
+}
+
+const DocDocumentIdRouteRouteWithChildren =
+  DocDocumentIdRouteRoute._addFileChildren(DocDocumentIdRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DocDocumentIdRoute: DocDocumentIdRoute,
+  DocDocumentIdRouteRoute: DocDocumentIdRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
