@@ -145,4 +145,9 @@
   .markdown-content li > :is(ul, ol) {
     margin-top: 0.25rem;
   }
+
+  .markdown-content > p {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
 }

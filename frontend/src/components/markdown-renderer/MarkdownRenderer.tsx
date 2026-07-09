@@ -12,7 +12,7 @@ import { markdownComponents } from "./markdown-components";
 // TOOD: style containers
 function MarkdownRenderer({ markdown }: { markdown: string }) {
   return (
-    <div className="markdown-content">
+    <div className="markdown-content max-w-full">
       <Markdown
         remarkPlugins={[
           [remarkGfm, { singleTilde: false }],

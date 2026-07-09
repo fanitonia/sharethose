@@ -4,8 +4,10 @@ import { apiClient } from "@lib/axios";
 
 import type { Document } from "@api/contracts";
 
-function getDocumentFn(documentId: string): Promise<Document> {
-  return apiClient.get(`api/documents/${documentId}`);
+function getDocumentFn(documentId: string) {
+  return apiClient
+    .get<Document>(`api/documents/${documentId}`)
+    .then((res) => res.data);
 }
 
 function getDocumentQueryOptions(documentId: string) {

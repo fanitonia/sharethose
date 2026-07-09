@@ -1,6 +1,6 @@
 function HorizontalRule({ ...props }: React.HTMLAttributes<HTMLHRElement>) {
   return (
-    <hr className="my-4 border-t border-muted-foreground w-full" {...props} />
+    <hr className="my-4 w-full border-t border-muted-foreground" {...props} />
   );
 }
 

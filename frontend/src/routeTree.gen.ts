@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as IndexRouteImport } from "./routes/index"
+import { Route as DocDocumentIdRouteImport } from "./routes/doc/$documentId"
 
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocDocumentIdRoute = DocDocumentIdRouteImport.update({
+  id: "/doc/$documentId",
+  path: "/doc/$documentId",
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
+  "/doc/$documentId": typeof DocDocumentIdRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/doc/$documentId": typeof DocDocumentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
+  "/doc/$documentId": typeof DocDocumentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: "/"
+  fullPaths: "/" | "/doc/$documentId"
   fileRoutesByTo: FileRoutesByTo
-  to: "/"
-  id: "__root__" | "/"
+  to: "/" | "/doc/$documentId"
+  id: "__root__" | "/" | "/doc/$documentId"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DocDocumentIdRoute: typeof DocDocumentIdRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -48,11 +58,19 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    "/doc/$documentId": {
+      id: "/doc/$documentId"
+      path: "/doc/$documentId"
+      fullPath: "/doc/$documentId"
+      preLoaderRoute: typeof DocDocumentIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DocDocumentIdRoute: DocDocumentIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

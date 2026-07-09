@@ -12,7 +12,7 @@ function Image({
       src={src}
       alt={alt}
       title={title}
-      className={cn("h-auto object-cover my-3", className)}
+      className={cn("my-3 h-auto max-w-full object-cover", className)}
       loading="lazy"
       {...rest}
     />

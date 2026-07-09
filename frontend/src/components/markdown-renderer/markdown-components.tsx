@@ -8,6 +8,7 @@ import { HorizontalRule } from "./elements/HorizontalRule";
 import { Image } from "./elements/Image";
 import { ListItem, OrderedList, UnorderedList } from "./elements/List";
 import Mark from "./elements/Mark";
+import Paragraph from "./elements/Paragraph";
 import { Pre } from "./elements/Pre";
 import {
   Table,
@@ -65,4 +66,5 @@ export const markdownComponents: Components = {
   ),
   li: ({ children, ...rest }) => <ListItem {...rest}>{children}</ListItem>,
   mark: ({ children }) => <Mark>{children}</Mark>,
+  p: ({ children }) => <Paragraph>{children}</Paragraph>,
 };
