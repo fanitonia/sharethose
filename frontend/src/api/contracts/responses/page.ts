@@ -2,7 +2,8 @@ interface Page {
   id: number;
   createdAt: Date;
   updatedAt: Date;
-  pageName: string;
+  name: string;
+  slug: string;
   content: string;
   pageNumber: number;
 }

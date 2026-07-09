@@ -1,14 +1,13 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
-import { Sidebar } from "@components/document-viewer";
-
 import { getDocumentQueryOptions } from "@api/queries/get-document";
 
+import { Sidebar } from "@components/document-viewer";
 import ProblemDetailsError from "@components/feedback/problem-details-error";
 
-export const Route = createFileRoute("/doc/$documentId")({
-  loader: async ({ params: { documentId }, context: { queryClient } }) => {
-    return queryClient.ensureQueryData(getDocumentQueryOptions(documentId));
+export const Route = createFileRoute("/doc/$documentSlug")({
+  loader: async ({ params: { documentSlug }, context: { queryClient } }) => {
+    return queryClient.ensureQueryData(getDocumentQueryOptions(documentSlug));
   },
   pendingComponent: () => <div className="m-4">Loading document...</div>,
   errorComponent: ({ error }) => (

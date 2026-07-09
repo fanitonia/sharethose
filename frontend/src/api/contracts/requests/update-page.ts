@@ -1,6 +1,7 @@
 interface UpdatePageRequest {
   id?: string;
-  pageName: string;
+  name: string;
+  slug: string;
   content: string;
   pageNumber: number;
 }

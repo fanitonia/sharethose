@@ -1,5 +1,6 @@
 interface CreatePageRequest {
-  pageName: string;
+  name: string;
+  slug: string;
   content: string;
   pageNumber: number;
 }

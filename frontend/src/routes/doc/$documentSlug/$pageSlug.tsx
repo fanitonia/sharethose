@@ -2,18 +2,16 @@ import { createFileRoute, getRouteApi } from "@tanstack/react-router";
 
 import { PageView } from "@/components/document-viewer";
 
-export const Route = createFileRoute("/doc/$documentId/$pageName")({
+export const Route = createFileRoute("/doc/$documentSlug/$pageSlug")({
   component: RouteComponent,
 });
 
-const documentRoute = getRouteApi("/doc/$documentId");
+const documentRoute = getRouteApi("/doc/$documentSlug");
 
 function RouteComponent() {
-  const { pageName } = Route.useParams();
+  const { pageSlug } = Route.useParams();
   const document = documentRoute.useLoaderData();
-  const page = document.pages.find(
-    (candidate) => candidate.pageName === pageName
-  );
+  const page = document.pages.find((candidate) => candidate.slug === pageSlug);
 
   if (!page) {
     return (

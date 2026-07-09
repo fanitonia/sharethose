@@ -5,6 +5,7 @@ interface Document {
   createdAt: Date;
   updatedAt: Date;
   title: string;
+  slug: string;
   expiresAt: Date;
   pages: Page[];
 }

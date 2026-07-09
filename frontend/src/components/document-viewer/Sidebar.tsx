@@ -3,7 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "@lib/utils";
 
 import type { Document } from "@api/contracts";
-import { ScrollArea, ScrollBar } from "@components/ui/scroll-area";
+
+import { ScrollArea } from "@components/ui/scroll-area";
 
 import { buttonVariants } from "../ui/button";
 
@@ -18,7 +19,7 @@ function Sidebar({
     <aside className={className}>
       <div className="flex h-full min-h-0 w-full flex-col gap-6">
         <div className="border-b border-border pb-4">
-          <h1 className="text-center text-2xl font-semibold text-foreground">
+          <h1 className="px-4 text-center text-2xl font-semibold text-foreground">
             {document.title}
           </h1>
         </div>
@@ -27,10 +28,10 @@ function Sidebar({
             {document.pages.map((page) => (
               <li key={page.id} className="flex w-full">
                 <Link
-                  to="/doc/$documentId/$pageName"
+                  to="/doc/$documentSlug/$pageSlug"
                   params={{
-                    documentId: document.id.toString(),
-                    pageName: page.pageName,
+                    documentSlug: document.slug,
+                    pageSlug: page.slug,
                   }}
                   activeProps={{
                     className: "bg-muted text-foreground",
@@ -42,7 +43,7 @@ function Sidebar({
                     ),
                   })}
                 >
-                  {page.pageName}
+                  {page.name}
                 </Link>
               </li>
             ))}
