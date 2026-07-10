@@ -11,7 +11,7 @@ using Persistence;
 
 namespace Persistence.Migrations
 {
-    [DbContext(typeof(DatabaseContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20260709144056_InitialBaseDesign")]
     partial class InitialBaseDesign
     {

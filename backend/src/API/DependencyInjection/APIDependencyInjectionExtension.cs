@@ -8,6 +8,7 @@ internal static class APIDependencyInjectionExtension
 {
     public static IServiceCollection AddWebApiServices(this IServiceCollection services)
     {
+        // TODO: Add env specific configuration for logging, (builder.Host.UseSerilog) (research) 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .WriteTo.Console()
@@ -16,8 +17,8 @@ internal static class APIDependencyInjectionExtension
         services.AddSerilog();
 
         services.AddControllers();
-
-        services.AddAuthorization();
+        // TODO: Add authentication and authorization
+        // services.AddAuthorization();
 
         services.AddProblemDetails();
 
@@ -25,7 +26,7 @@ internal static class APIDependencyInjectionExtension
                 .AddFluentValidationAutoValidation();
 
         services.AddOpenApi();
-
+        // TODO: Add env specific configuration for CORS (research)
         services.AddCors(opt =>
         {
             opt.AddDefaultPolicy(policy =>

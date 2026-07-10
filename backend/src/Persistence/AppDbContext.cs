@@ -4,7 +4,8 @@ using Persistence.Seed;
 
 namespace Persistence;
 
-public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options)
+// TODO: application layer should not depend on persistence layer, create abstractions in application layer and implement them in persistence layer
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<Document> Documents { get; set; }
     public DbSet<Page> Pages { get; set; }
@@ -12,7 +13,7 @@ public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbCont
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(DatabaseContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         modelBuilder.SeedInitialData();
 

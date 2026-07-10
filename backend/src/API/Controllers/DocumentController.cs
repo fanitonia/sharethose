@@ -10,7 +10,8 @@ namespace API.Controllers;
 [ApiController]
 public class DocumentController(IDocumentQueryService query, IDocumentCommandService command) : ControllerBase
 {
-
+    // TODO: add response metadata for swagger, [ProducesResponseType], xml comments, etc.
+    // TODO: should get edit key and password from headers (or body) instead of query params 
     [HttpGet("{slug}")]
     public async Task<ActionResult<DocumentResponse>> GetDocument([FromRoute] string slug, [FromQuery] string? password, CancellationToken ct)
     {
@@ -34,7 +35,7 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
             return result.ToProblemDetails(HttpContext);
         }
 
-        return Ok(new DocumentResponseWithEditKey
+        return CreatedAtAction(nameof(GetDocument), new { slug = result.Value.document.Slug }, new DocumentResponseWithEditKey
         {
             Document = result.Value.document,
             EditKey = result.Value.editKey
@@ -55,7 +56,7 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<DocumentResponse>> UpdateDocumentData([FromBody] UpdateDocumentContentRequest request, [FromRoute] string id, [FromQuery] string editKey)
+    public async Task<ActionResult<DocumentResponse>> UpdateDocumentContent([FromBody] UpdateDocumentContentRequest request, [FromRoute] string id, [FromQuery] string editKey)
     {
         var result = await command.UpdateDocumentContentAsync(request, id, editKey);
 

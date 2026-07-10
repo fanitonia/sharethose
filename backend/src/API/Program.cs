@@ -5,7 +5,8 @@ using Persistence.DependencyInjection;
 using Serilog;
 
 namespace API;
-
+// TODO: Startup fatal errors do not fail the process, Re-throw after logging or set a non-zero exit code.
+// TODO: Add tests.
 public class Program
 {
     public static async Task Main(string[] args)
@@ -16,7 +17,7 @@ public class Program
 
             builder.Services.AddWebApiServices()
                             .AddPersistenceServices(builder.Configuration)
-                            .AddApplicationServices(builder.Configuration);
+                            .AddApplicationServices();
 
             var app = builder.Build();
 

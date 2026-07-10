@@ -13,13 +13,16 @@ using shortid;
 
 namespace Application.Features.Documents.Services;
 
-public class DocumentCommandService(DatabaseContext context, IDocumentQueryService query) : IDocumentCommandService
+public class DocumentCommandService(AppDbContext context, IDocumentQueryService query) : IDocumentCommandService
 {
     ShortIdOptions idOptions = new ShortIdOptions(
         useNumbers: true, useSpecialCharacters: false, length: 15
     );
 
     // TODO: custom editKey by user
+    // TODO: hash password and editKey with better tools IPasswordHasher, PBKDF2, bcrypt, Argon2
+    // TODO: remove the check for slug existence, because db will return a error anyway, catch DbUpdateException and return a proper error message (research)
+    // TODO: remove custom page slugs
     public async Task<Result<(DocumentResponse document, string editKey)>> CreateDocumentAsync(CreateDocumentRequest request)
     {
         if (request.Slug is not null && await query.IsDocumentExistsAsync(request.Slug, CancellationToken.None))
@@ -250,7 +253,7 @@ public class DocumentCommandService(DatabaseContext context, IDocumentQueryServi
 
         return Result.Success();
     }
-
+    // TODO: bunu yapmak yerine client'tan gelen request'in sırasına göre sayfaları number'larını güncellemek daha mantıklı olabilir. Çünkü client'tan gelen request'in sırası, kullanıcı tarafından belirlenen sıralamayı temsil eder. Bu nedenle, sayfaları yeniden sıralamak yerine, client'tan gelen request'in sırasına göre sayfa numaralarını güncellemek daha doğru bir yaklaşım olabilir.
     private List<Page> ReorderPages(Page[] pages)
     {
         var orderedPages = pages
@@ -266,6 +269,7 @@ public class DocumentCommandService(DatabaseContext context, IDocumentQueryServi
         return orderedPages;
     }
 
+    // TODO: use a proper slug generation (Slugify.Core)
     private string GenerateSlug(string title)
     {
         var slug = title.ToLower().Trim().Replace(" ", "-").Normalize();
