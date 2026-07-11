@@ -22,5 +22,4 @@ internal class PageConfiguration : IEntityTypeConfiguration<Page>
 
         entity.ToTable(t => t.HasCheckConstraint("CK_Page_PageNumber", "page_number > 0"));
     }
-
 }

@@ -64,6 +64,9 @@ namespace Persistence.Migrations
                     b.HasKey("Id")
                         .HasName("pk_documents");
 
+                    b.HasIndex("ExpireAt")
+                        .HasDatabaseName("ix_documents_expire_at");
+
                     b.HasIndex("Slug")
                         .IsUnique()
                         .HasDatabaseName("ix_documents_slug");

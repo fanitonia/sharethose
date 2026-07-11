@@ -14,5 +14,7 @@ internal class DocumentConfiguration : IEntityTypeConfiguration<Document>
 
         entity.HasIndex(p => p.Slug)
             .IsUnique();
+
+        entity.HasIndex(doc => doc.ExpireAt);
     }
 }

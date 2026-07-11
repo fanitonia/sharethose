@@ -12,7 +12,7 @@ using Persistence;
 namespace Application.Features.Documents.Services;
 
 // TODO: a query service should not delete data, just return the error but delete the expired one in a background service
-public class DocumentQueryService(AppDbContext context, IPasswordHasher<Document> passwordHasher) : IDocumentQueryService
+public class DocumentQueryService(AppDbContext context, IPasswordHasher<Document> hasher) : IDocumentQueryService
 {
     public async Task<Result<DocumentResponse>> GetDocumentAsync(string documentSlug, string? password, CancellationToken ct)
     {
@@ -26,12 +26,7 @@ public class DocumentQueryService(AppDbContext context, IPasswordHasher<Document
             return CommonErrors.NotFound;
 
         if (document.IsDocumentExpired())
-        {
-            context.Remove(document);
-            await context.SaveChangesAsync(ct);
-
             return DocumentErrors.Expired;
-        }
 
         if (!IsPasswordValid(document, password))
             return DocumentErrors.InvalidPassword;
@@ -53,7 +48,7 @@ public class DocumentQueryService(AppDbContext context, IPasswordHasher<Document
     {
         return document.PasswordHash is null ||
             password is not null &&
-            passwordHasher.VerifyHashedPassword(document, document.PasswordHash, password)
+            hasher.VerifyHashedPassword(document, document.PasswordHash, password)
             != PasswordVerificationResult.Failed;
     }
 }

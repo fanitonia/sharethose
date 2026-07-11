@@ -16,7 +16,7 @@ namespace Application.Features.Documents.Services;
 
 public class DocumentCommandService(
     AppDbContext context,
-    IPasswordHasher<Document> passwordHasher) : IDocumentCommandService
+    IPasswordHasher<Document> hasher) : IDocumentCommandService
 {
     ShortIdOptions idOptions = new ShortIdOptions(
         useNumbers: true, useSpecialCharacters: false, length: 15
@@ -46,10 +46,10 @@ public class DocumentCommandService(
             }).ToList()
         };
 
-        document.EditKeyHash = passwordHasher.HashPassword(document, editKey);
+        document.EditKeyHash = hasher.HashPassword(document, editKey);
         document.PasswordHash = request.Password is null
             ? null
-            : passwordHasher.HashPassword(document, request.Password);
+            : hasher.HashPassword(document, request.Password);
 
         context.Documents.Add(document);
         int result;
@@ -247,7 +247,7 @@ public class DocumentCommandService(
         if (IsPasswordValid(document, request.Password))
             return DocumentErrors.NoChangesFound;
 
-        document.PasswordHash = passwordHasher.HashPassword(document, request.Password);
+        document.PasswordHash = hasher.HashPassword(document, request.Password);
         document.UpdatedAt = DateTime.UtcNow;
 
         var result = await context.SaveChangesAsync();
@@ -260,14 +260,14 @@ public class DocumentCommandService(
 
     private bool IsEditKeyValid(Document document, string editKey)
     {
-        return passwordHasher.VerifyHashedPassword(document, document.EditKeyHash, editKey)
+        return hasher.VerifyHashedPassword(document, document.EditKeyHash, editKey)
             != PasswordVerificationResult.Failed;
     }
 
     private bool IsPasswordValid(Document document, string password)
     {
         return document.PasswordHash is not null &&
-            passwordHasher.VerifyHashedPassword(document, document.PasswordHash, password)
+            hasher.VerifyHashedPassword(document, document.PasswordHash, password)
             != PasswordVerificationResult.Failed;
     }
 

@@ -1,5 +1,5 @@
 ﻿namespace Domain.Entities;
-// TODO: move UpdateContent, SetPassword, ValidateEditKey or ReorderPages to domain models Document and Page
+// TODO: move UpdateContent, SetPassword, ValidateEditKey to domain models Document and Page
 public class Document
 {
     public Guid Id { get; set; }

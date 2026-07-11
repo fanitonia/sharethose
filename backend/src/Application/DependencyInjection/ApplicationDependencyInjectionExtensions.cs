@@ -13,6 +13,7 @@ public static class ApplicationDependencyInjectionExtensions
         services.AddScoped<IPasswordHasher<Document>, PasswordHasher<Document>>();
         services.AddScoped<IDocumentQueryService, DocumentQueryService>();
         services.AddScoped<IDocumentCommandService, DocumentCommandService>();
+        services.AddHostedService<ExpiredDocumentCleaner>();
 
         return services;
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -70,6 +71,11 @@ namespace Persistence.Migrations
                     { 1, "# A Title\n\nThis is the content of the first page.", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000000-0000-0000-0000-000000000001"), "Introduction", (short)1, "introduction", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
                     { 2, "- This is the content of the second page.", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000000-0000-0000-0000-000000000001"), "Second Page", (short)2, "second-page", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_documents_expire_at",
+                table: "documents",
+                column: "expire_at");
 
             migrationBuilder.CreateIndex(
                 name: "ix_documents_slug",

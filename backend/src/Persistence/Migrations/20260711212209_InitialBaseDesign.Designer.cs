@@ -12,7 +12,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260711083346_InitialBaseDesign")]
+    [Migration("20260711212209_InitialBaseDesign")]
     partial class InitialBaseDesign
     {
         /// <inheritdoc />
@@ -66,6 +66,9 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_documents");
+
+                    b.HasIndex("ExpireAt")
+                        .HasDatabaseName("ix_documents_expire_at");
 
                     b.HasIndex("Slug")
                         .IsUnique()
