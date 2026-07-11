@@ -4,13 +4,15 @@ using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Errors;
 using Application.Features.Documents.Helpers;
 using Application.Features.Documents.Interfaces;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 
 namespace Application.Features.Documents.Services;
 
 // TODO: a query service should not delete data, just return the error but delete the expired one in a background service
-public class DocumentQueryService(AppDbContext context) : IDocumentQueryService
+public class DocumentQueryService(AppDbContext context, IPasswordHasher<Document> passwordHasher) : IDocumentQueryService
 {
     public async Task<Result<DocumentResponse>> GetDocumentAsync(string documentSlug, string? password, CancellationToken ct)
     {
@@ -31,7 +33,7 @@ public class DocumentQueryService(AppDbContext context) : IDocumentQueryService
             return DocumentErrors.Expired;
         }
 
-        if (!document.IsPasswordValid(password))
+        if (!IsPasswordValid(document, password))
             return DocumentErrors.InvalidPassword;
 
         document.Pages = document.Pages.OrderBy(p => p.PageNumber).ThenBy(p => p.Id).ToList();
@@ -45,5 +47,13 @@ public class DocumentQueryService(AppDbContext context) : IDocumentQueryService
         return await context.Documents
             .AsNoTracking()
             .AnyAsync(d => d.Slug == documentSlug, ct);
+    }
+
+    private bool IsPasswordValid(Document document, string? password)
+    {
+        return document.PasswordHash is null ||
+            password is not null &&
+            passwordHasher.VerifyHashedPassword(document, document.PasswordHash, password)
+            != PasswordVerificationResult.Failed;
     }
 }

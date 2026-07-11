@@ -5,7 +5,6 @@ using Persistence.DependencyInjection;
 using Serilog;
 
 namespace API;
-// TODO: Startup fatal errors do not fail the process, Re-throw after logging or set a non-zero exit code.
 // TODO: Add tests.
 public class Program
 {
@@ -55,6 +54,7 @@ public class Program
         catch (Exception ex)
         {
             Log.Fatal(ex, "Application terminated unexpectedly");
+            throw;
         }
         finally
         {

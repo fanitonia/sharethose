@@ -3,7 +3,6 @@ using Application.Features.Documents.DTOs.Requests;
 using Application.Features.Documents.DTOs.Responses;
 
 namespace Application.Features.Documents.Interfaces;
-// TODO: add cancelation token to all methods
 // TODO: delete document editKey must be mandatory. but admin?
 public interface IDocumentCommandService
 {

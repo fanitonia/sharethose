@@ -5,22 +5,24 @@ using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Errors;
 using Application.Features.Documents.Helpers;
 using Application.Features.Documents.Interfaces;
-using Application.Helpers;
 using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using shortid;
 
 namespace Application.Features.Documents.Services;
 
-public class DocumentCommandService(AppDbContext context, IDocumentQueryService query) : IDocumentCommandService
+public class DocumentCommandService(
+    AppDbContext context,
+    IDocumentQueryService query,
+    IPasswordHasher<Document> passwordHasher) : IDocumentCommandService
 {
     ShortIdOptions idOptions = new ShortIdOptions(
         useNumbers: true, useSpecialCharacters: false, length: 15
     );
 
     // TODO: custom editKey by user
-    // TODO: hash password and editKey with better tools IPasswordHasher, PBKDF2, bcrypt, Argon2
     // TODO: remove the check for slug existence, because db will return a error anyway, catch DbUpdateException and return a proper error message (research)
     // TODO: remove custom page slugs
     public async Task<Result<(DocumentResponse document, string editKey)>> CreateDocumentAsync(CreateDocumentRequest request)
@@ -33,7 +35,6 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
         Guid documentId = Guid.NewGuid();
         string slug = request.Slug ?? ShortId.Generate(idOptions);
         string editKey = ShortId.Generate(idOptions);
-        string? passwordHash = request.Password is not null ? Sha256Hasher.ComputeHash(request.Password) : null;
 
         var document = new Document
         {
@@ -41,8 +42,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
             Slug = slug,
             ExpireAt = request.ExpireAt,
             Title = request.Title,
-            EditKeyHash = Sha256Hasher.ComputeHash(editKey),
-            PasswordHash = passwordHash,
+            EditKeyHash = string.Empty,
             Pages = request.Pages.Select(p => new Page
             {
                 Name = p.Name,
@@ -52,6 +52,11 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
                 DocumentId = documentId
             }).ToList()
         };
+
+        document.EditKeyHash = passwordHasher.HashPassword(document, editKey);
+        document.PasswordHash = request.Password is null
+            ? null
+            : passwordHasher.HashPassword(document, request.Password);
 
         var reorderedPages = ReorderPages(document.Pages.ToArray());
         document.Pages = reorderedPages;
@@ -74,7 +79,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
         if (document is null)
             return CommonErrors.NotFound;
 
-        if (editKey is not null && !document.IsEditKeyValid(editKey))
+        if (editKey is not null && !IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
         context.Documents.Remove(document);
@@ -96,7 +101,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
         if (document is null)
             return CommonErrors.NotFound;
 
-        if (!document.IsEditKeyValid(editKey))
+        if (!IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
         var documentChanged = false;
@@ -198,7 +203,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
         if (document == null)
             return CommonErrors.NotFound;
 
-        if (!document.IsEditKeyValid(editKey))
+        if (!IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
         if (document.ExpireAt == request.ExpireAt)
@@ -225,7 +230,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
         if (document == null)
             return CommonErrors.NotFound;
 
-        if (!document.IsEditKeyValid(editKey))
+        if (!IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
         if (request.Password is null)
@@ -240,10 +245,10 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
             return Result.Success();
         }
 
-        if (document.PasswordHash == Sha256Hasher.ComputeHash(request.Password))
+        if (IsPasswordValid(document, request.Password))
             return DocumentErrors.NoChangesFound;
 
-        document.PasswordHash = Sha256Hasher.ComputeHash(request.Password);
+        document.PasswordHash = passwordHasher.HashPassword(document, request.Password);
         document.UpdatedAt = DateTime.UtcNow;
 
         var result = await context.SaveChangesAsync();
@@ -253,6 +258,20 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
 
         return Result.Success();
     }
+
+    private bool IsEditKeyValid(Document document, string editKey)
+    {
+        return passwordHasher.VerifyHashedPassword(document, document.EditKeyHash, editKey)
+            != PasswordVerificationResult.Failed;
+    }
+
+    private bool IsPasswordValid(Document document, string password)
+    {
+        return document.PasswordHash is not null &&
+            passwordHasher.VerifyHashedPassword(document, document.PasswordHash, password)
+            != PasswordVerificationResult.Failed;
+    }
+
     // TODO: bunu yapmak yerine client'tan gelen request'in sırasına göre sayfaları number'larını güncellemek daha mantıklı olabilir. Çünkü client'tan gelen request'in sırası, kullanıcı tarafından belirlenen sıralamayı temsil eder. Bu nedenle, sayfaları yeniden sıralamak yerine, client'tan gelen request'in sırasına göre sayfa numaralarını güncellemek daha doğru bir yaklaşım olabilir.
     private List<Page> ReorderPages(Page[] pages)
     {
