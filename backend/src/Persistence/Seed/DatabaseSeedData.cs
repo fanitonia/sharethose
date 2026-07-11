@@ -10,7 +10,7 @@ internal static class DatabaseSeedData
         modelBuilder.Entity<Document>().HasData(
             new Document
             {
-                Id = "sample1",
+                Id = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                 Title = "Sample Document",
                 Slug = "sample-document",
                 EditKeyHash = "samplekey",
@@ -26,7 +26,7 @@ internal static class DatabaseSeedData
                Id = 1,
                Name = "Introduction",
                Slug = "introduction",
-               DocumentId = "sample1",
+               DocumentId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                Content = "# A Title\n\nThis is the content of the first page.",
                PageNumber = 1,
                CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -37,7 +37,7 @@ internal static class DatabaseSeedData
                Id = 2,
                Name = "Second Page",
                Slug = "second-page",
-               DocumentId = "sample1",
+               DocumentId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
                Content = "- This is the content of the second page.",
                PageNumber = 2,
                CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),

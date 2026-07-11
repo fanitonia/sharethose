@@ -17,7 +17,7 @@ namespace Persistence.Migrations
                 name: "documents",
                 columns: table => new
                 {
-                    id = table.Column<string>(type: "text", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     slug = table.Column<string>(type: "text", nullable: false),
@@ -43,7 +43,7 @@ namespace Persistence.Migrations
                     name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     content = table.Column<string>(type: "character varying(100000)", maxLength: 100000, nullable: false),
                     page_number = table.Column<short>(type: "smallint", nullable: false),
-                    document_id = table.Column<string>(type: "text", nullable: false)
+                    document_id = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,15 +60,15 @@ namespace Persistence.Migrations
             migrationBuilder.InsertData(
                 table: "documents",
                 columns: new[] { "id", "created_at", "edit_key_hash", "expire_at", "password_hash", "slug", "title", "updated_at" },
-                values: new object[] { "sample1", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc), "samplekey", new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "sample-document", "Sample Document", new DateTime(2026, 7, 2, 0, 0, 0, 0, DateTimeKind.Utc) });
+                values: new object[] { new Guid("00000000-0000-0000-0000-000000000001"), new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc), "samplekey", new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc), null, "sample-document", "Sample Document", new DateTime(2026, 7, 2, 0, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 table: "pages",
                 columns: new[] { "id", "content", "created_at", "document_id", "name", "page_number", "slug", "updated_at" },
                 values: new object[,]
                 {
-                    { 1, "# A Title\n\nThis is the content of the first page.", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc), "sample1", "Introduction", (short)1, "introduction", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
-                    { 2, "- This is the content of the second page.", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc), "sample1", "Second Page", (short)2, "second-page", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
+                    { 1, "# A Title\n\nThis is the content of the first page.", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000000-0000-0000-0000-000000000001"), "Introduction", (short)1, "introduction", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc) },
+                    { 2, "- This is the content of the second page.", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc), new Guid("00000000-0000-0000-0000-000000000001"), "Second Page", (short)2, "second-page", new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc) }
                 });
 
             migrationBuilder.CreateIndex(

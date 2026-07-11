@@ -30,7 +30,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
             return DocumentErrors.SlugAlreadyExists;
         }
 
-        string documentId = Guid.NewGuid().ToString();
+        Guid documentId = Guid.NewGuid();
         string slug = request.Slug ?? ShortId.Generate(idOptions);
         string editKey = ShortId.Generate(idOptions);
         string? passwordHash = request.Password is not null ? Sha256Hasher.ComputeHash(request.Password) : null;
@@ -68,7 +68,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
 
     }
 
-    public async Task<Result> DeleteDocumentAsync(string documentId, string? editKey = null)
+    public async Task<Result> DeleteDocumentAsync(Guid documentId, string? editKey = null)
     {
         var document = await context.Documents.FindAsync(documentId);
         if (document is null)
@@ -87,7 +87,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
     }
 
     // TODO: if only page number changed, do not update the page updatedAt, only update the document updatedAt. 
-    public async Task<Result<DocumentResponse>> UpdateDocumentContentAsync(UpdateDocumentContentRequest request, string documentId, string editKey)
+    public async Task<Result<DocumentResponse>> UpdateDocumentContentAsync(UpdateDocumentContentRequest request, Guid documentId, string editKey)
     {
         var document = await context.Documents
             .Include(d => d.Pages)
@@ -191,7 +191,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
         return new DocumentResponse(document);
     }
 
-    public async Task<Result<DocumentResponse>> UpdateDocumentExpireDateAsync(UpdateDocumentExpireDateRequest request, string documentId, string editKey)
+    public async Task<Result<DocumentResponse>> UpdateDocumentExpireDateAsync(UpdateDocumentExpireDateRequest request, Guid documentId, string editKey)
     {
         var document = await context.Documents.Include(d => d.Pages).FirstOrDefaultAsync(d => d.Id == documentId);
 
@@ -218,7 +218,7 @@ public class DocumentCommandService(AppDbContext context, IDocumentQueryService 
         return new DocumentResponse(document);
     }
 
-    public async Task<Result> UpdateDocumentPasswordAsync(UpdateDocumentPasswordRequest request, string documentId, string editKey)
+    public async Task<Result> UpdateDocumentPasswordAsync(UpdateDocumentPasswordRequest request, Guid documentId, string editKey)
     {
         var document = await context.Documents.FindAsync(documentId);
 

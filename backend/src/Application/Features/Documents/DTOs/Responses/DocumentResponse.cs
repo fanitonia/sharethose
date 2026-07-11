@@ -5,7 +5,7 @@ namespace Application.Features.Documents.DTOs.Responses;
 
 public class DocumentResponse
 {
-    public required string Id { get; set; }
+    public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

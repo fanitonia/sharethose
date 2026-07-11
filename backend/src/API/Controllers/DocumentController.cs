@@ -43,7 +43,7 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> DeleteDocument([FromRoute] string id, [FromQuery] string editKey)
+    public async Task<ActionResult> DeleteDocument([FromRoute] Guid id, [FromQuery] string editKey)
     {
         var result = await command.DeleteDocumentAsync(id, editKey);
 
@@ -56,7 +56,7 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<DocumentResponse>> UpdateDocumentContent([FromBody] UpdateDocumentContentRequest request, [FromRoute] string id, [FromQuery] string editKey)
+    public async Task<ActionResult<DocumentResponse>> UpdateDocumentContent([FromBody] UpdateDocumentContentRequest request, [FromRoute] Guid id, [FromQuery] string editKey)
     {
         var result = await command.UpdateDocumentContentAsync(request, id, editKey);
 
@@ -69,7 +69,7 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
     }
 
     [HttpPatch("{id}/expire-date")]
-    public async Task<ActionResult<DocumentResponse>> UpdateDocumentExpireDate([FromBody] UpdateDocumentExpireDateRequest request, [FromRoute] string id, [FromQuery] string editKey)
+    public async Task<ActionResult<DocumentResponse>> UpdateDocumentExpireDate([FromBody] UpdateDocumentExpireDateRequest request, [FromRoute] Guid id, [FromQuery] string editKey)
     {
         var result = await command.UpdateDocumentExpireDateAsync(request, id, editKey);
 
@@ -82,7 +82,7 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
     }
 
     [HttpPatch("{id}/password")]
-    public async Task<ActionResult> UpdateDocumentPassword([FromBody] UpdateDocumentPasswordRequest request, [FromRoute] string id, [FromQuery] string editKey)
+    public async Task<ActionResult> UpdateDocumentPassword([FromBody] UpdateDocumentPasswordRequest request, [FromRoute] Guid id, [FromQuery] string editKey)
     {
         var result = await command.UpdateDocumentPasswordAsync(request, id, editKey);
 

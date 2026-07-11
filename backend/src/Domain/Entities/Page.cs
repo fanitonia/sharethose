@@ -11,6 +11,6 @@ public class Page
     public required string Content { get; set; }
     public required ushort PageNumber { get; set; }
 
-    public required string DocumentId { get; set; }
+    public Guid DocumentId { get; set; }
     public Document Document { get; set; } = null!;
 }

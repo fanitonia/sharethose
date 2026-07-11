@@ -12,7 +12,7 @@ using Persistence;
 namespace Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260709144056_InitialBaseDesign")]
+    [Migration("20260711083346_InitialBaseDesign")]
     partial class InitialBaseDesign
     {
         /// <inheritdoc />
@@ -27,8 +27,9 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.Document", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
@@ -75,7 +76,7 @@ namespace Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "sample1",
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             EditKeyHash = "samplekey",
                             ExpireAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Utc),
@@ -104,9 +105,8 @@ namespace Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("DocumentId")
-                        .IsRequired()
-                        .HasColumnType("text")
+                    b.Property<Guid>("DocumentId")
+                        .HasColumnType("uuid")
                         .HasColumnName("document_id");
 
                     b.Property<string>("Name")
@@ -145,7 +145,7 @@ namespace Persistence.Migrations
                             Id = 1,
                             Content = "# A Title\n\nThis is the content of the first page.",
                             CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DocumentId = "sample1",
+                            DocumentId = new Guid("00000000-0000-0000-0000-000000000001"),
                             Name = "Introduction",
                             PageNumber = (short)1,
                             Slug = "introduction",
@@ -156,7 +156,7 @@ namespace Persistence.Migrations
                             Id = 2,
                             Content = "- This is the content of the second page.",
                             CreatedAt = new DateTime(2026, 7, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            DocumentId = "sample1",
+                            DocumentId = new Guid("00000000-0000-0000-0000-000000000001"),
                             Name = "Second Page",
                             PageNumber = (short)2,
                             Slug = "second-page",
