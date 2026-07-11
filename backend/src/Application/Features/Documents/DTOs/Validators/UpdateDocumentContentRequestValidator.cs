@@ -15,7 +15,9 @@ public class UpdateDocumentContentRequestValidator : AbstractValidator<UpdateDoc
 
         RuleFor(q => q.Pages)
             .NotEmpty()
-                .WithMessage("At least one page is required.");
+                .WithMessage("At least one page is required.")
+            .Must(pages => pages.Count <= ushort.MaxValue)
+                .WithMessage($"A document cannot contain more than {ushort.MaxValue} pages.");
 
         RuleForEach(q => q.Pages)
             .SetValidator(new UpdatePageRequestValidator());

@@ -3,19 +3,19 @@ using Application.Common.Result;
 using Application.Features.Documents.DTOs.Requests;
 using Application.Features.Documents.DTOs.Responses;
 using Application.Features.Documents.Errors;
-using Application.Features.Documents.Helpers;
 using Application.Features.Documents.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Persistence;
 using shortid;
+using Slugify;
 
 namespace Application.Features.Documents.Services;
 
 public class DocumentCommandService(
     AppDbContext context,
-    IDocumentQueryService query,
     IPasswordHasher<Document> passwordHasher) : IDocumentCommandService
 {
     ShortIdOptions idOptions = new ShortIdOptions(
@@ -23,15 +23,8 @@ public class DocumentCommandService(
     );
 
     // TODO: custom editKey by user
-    // TODO: remove the check for slug existence, because db will return a error anyway, catch DbUpdateException and return a proper error message (research)
-    // TODO: remove custom page slugs
     public async Task<Result<(DocumentResponse document, string editKey)>> CreateDocumentAsync(CreateDocumentRequest request)
     {
-        if (request.Slug is not null && await query.IsDocumentExistsAsync(request.Slug, CancellationToken.None))
-        {
-            return DocumentErrors.SlugAlreadyExists;
-        }
-
         Guid documentId = Guid.NewGuid();
         string slug = request.Slug ?? ShortId.Generate(idOptions);
         string editKey = ShortId.Generate(idOptions);
@@ -43,12 +36,12 @@ public class DocumentCommandService(
             ExpireAt = request.ExpireAt,
             Title = request.Title,
             EditKeyHash = string.Empty,
-            Pages = request.Pages.Select(p => new Page
+            Pages = request.Pages.Select((p, index) => new Page
             {
                 Name = p.Name,
-                Slug = p.Slug ?? GenerateSlug(p.Name),
+                Slug = GenerateSlug(p.Name),
                 Content = p.Content,
-                PageNumber = p.PageNumber,
+                PageNumber = (ushort)(index + 1),
                 DocumentId = documentId
             }).ToList()
         };
@@ -58,11 +51,20 @@ public class DocumentCommandService(
             ? null
             : passwordHasher.HashPassword(document, request.Password);
 
-        var reorderedPages = ReorderPages(document.Pages.ToArray());
-        document.Pages = reorderedPages;
-
         context.Documents.Add(document);
-        var result = await context.SaveChangesAsync();
+        int result;
+        try
+        {
+            result = await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (ex.InnerException is PostgresException
+        {
+            SqlState: PostgresErrorCodes.UniqueViolation,
+            ConstraintName: "ix_documents_slug"
+        })
+        {
+            return DocumentErrors.SlugAlreadyExists;
+        }
 
         if (result <= 0)
         {
@@ -91,7 +93,6 @@ public class DocumentCommandService(
         return Result.Success();
     }
 
-    // TODO: if only page number changed, do not update the page updatedAt, only update the document updatedAt. 
     public async Task<Result<DocumentResponse>> UpdateDocumentContentAsync(UpdateDocumentContentRequest request, Guid documentId, string editKey)
     {
         var document = await context.Documents
@@ -104,7 +105,20 @@ public class DocumentCommandService(
         if (!IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
+        var existingPagesById = document.Pages.ToDictionary(page => page.Id);
+        var requestedPageIds = request.Pages
+            .Where(page => page.Id.HasValue)
+            .Select(page => page.Id!.Value)
+            .ToArray();
+
+        if (requestedPageIds.Distinct().Count() != requestedPageIds.Length ||
+            requestedPageIds.Any(pageId => !existingPagesById.ContainsKey(pageId)))
+        {
+            return CommonErrors.InvalidInput;
+        }
+
         var documentChanged = false;
+        var changedAt = DateTime.UtcNow;
 
         if (document.Title != request.Title)
         {
@@ -112,33 +126,26 @@ public class DocumentCommandService(
             documentChanged = true;
         }
 
-        var existingPagesById = document.Pages.ToDictionary(p => p.Id);
-        var requestedPageIds = request.Pages
-            .Where(p => p.Id.HasValue)
-            .Select(p => p.Id!.Value)
-            .ToHashSet();
-
-        foreach (var removedPage in document.Pages.Where(p => !requestedPageIds.Contains(p.Id)).ToList())
+        var requestedPageIdSet = requestedPageIds.ToHashSet();
+        foreach (var removedPage in document.Pages.Where(page => !requestedPageIdSet.Contains(page.Id)).ToList())
         {
             document.Pages.Remove(removedPage);
             documentChanged = true;
         }
 
-        foreach (var pageRequest in request.Pages)
+        foreach (var (pageRequest, index) in request.Pages.Select((page, index) => (page, index)))
         {
-            if (pageRequest.Id is int id && existingPagesById.TryGetValue(id, out var existingPage))
+            var pageNumber = (ushort)(index + 1);
+
+            if (pageRequest.Id is int pageId)
             {
+                var existingPage = existingPagesById[pageId];
                 var pageChanged = false;
 
                 if (existingPage.Name != pageRequest.Name)
                 {
                     existingPage.Name = pageRequest.Name;
-                    pageChanged = true;
-                }
-
-                if (existingPage.Slug != pageRequest.Slug)
-                {
-                    existingPage.Slug = pageRequest.Slug ?? GenerateSlug(pageRequest.Name);
+                    existingPage.Slug = GenerateSlug(pageRequest.Name);
                     pageChanged = true;
                 }
 
@@ -148,29 +155,26 @@ public class DocumentCommandService(
                     pageChanged = true;
                 }
 
-                if (existingPage.PageNumber != pageRequest.PageNumber)
+                if (existingPage.PageNumber != pageNumber)
                 {
-                    existingPage.PageNumber = pageRequest.PageNumber;
+                    existingPage.PageNumber = pageNumber;
                     pageChanged = true;
                 }
 
-
-
                 if (pageChanged)
                 {
-                    existingPage.UpdatedAt = DateTime.UtcNow;
+                    existingPage.UpdatedAt = changedAt;
                     documentChanged = true;
                 }
             }
             else
             {
-                // request page Id is null means a new page
                 document.Pages.Add(new Page
                 {
                     Name = pageRequest.Name,
-                    Slug = pageRequest.Slug ?? GenerateSlug(pageRequest.Name),
+                    Slug = GenerateSlug(pageRequest.Name),
                     Content = pageRequest.Content,
-                    PageNumber = pageRequest.PageNumber,
+                    PageNumber = pageNumber,
                     DocumentId = documentId
                 });
 
@@ -178,15 +182,10 @@ public class DocumentCommandService(
             }
         }
 
-        // Reorder pages to ensure consistent ordering
-        var orderedPages = ReorderPages(document.Pages.ToArray());
-
-        document.Pages = orderedPages;
-
         if (!documentChanged)
             return DocumentErrors.NoChangesFound;
 
-        document.UpdatedAt = DateTime.UtcNow;
+        document.UpdatedAt = changedAt;
 
         var result = await context.SaveChangesAsync();
 
@@ -272,26 +271,14 @@ public class DocumentCommandService(
             != PasswordVerificationResult.Failed;
     }
 
-    // TODO: bunu yapmak yerine client'tan gelen request'in sırasına göre sayfaları number'larını güncellemek daha mantıklı olabilir. Çünkü client'tan gelen request'in sırası, kullanıcı tarafından belirlenen sıralamayı temsil eder. Bu nedenle, sayfaları yeniden sıralamak yerine, client'tan gelen request'in sırasına göre sayfa numaralarını güncellemek daha doğru bir yaklaşım olabilir.
-    private List<Page> ReorderPages(Page[] pages)
-    {
-        var orderedPages = pages
-            .OrderBy(p => p.PageNumber)
-            .ThenBy(p => p.Id)
-            .ToList();
-        for (var i = 0; i < orderedPages.Count; i++)
-        {
-            var expectedPageNumber = (ushort)(i + 1);
-            if (orderedPages[i].PageNumber != expectedPageNumber)
-                orderedPages[i].PageNumber = expectedPageNumber;
-        }
-        return orderedPages;
-    }
-
-    // TODO: use a proper slug generation (Slugify.Core)
     private string GenerateSlug(string title)
     {
-        var slug = title.ToLower().Trim().Replace(" ", "-").Normalize();
+        SlugHelper slugHelper = new SlugHelper();
+        string slug = slugHelper.GenerateSlug(title);
+
+        if (String.IsNullOrEmpty(slug))
+            slug = ShortId.Generate(idOptions);
+
         return slug;
     }
 }

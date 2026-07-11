@@ -18,6 +18,7 @@
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="2.0.0" />
     <PackageVersion Include="shortid" Version="5.1.1" />
+    <PackageVersion Include="Slugify.Core" Version="5.1.1" />
     <PackageVersion Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
   </ItemGroup>
   <!-- transitive pinned packages -->
