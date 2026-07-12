@@ -1,14 +1,21 @@
 import { Link } from "@tanstack/react-router";
 
-import { cn } from "@lib/utils";
+import type { Document } from "@/api/contracts";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
-import type { Document } from "@api/contracts";
-
-import { ScrollArea } from "@components/ui/scroll-area";
+import { MenuIcon } from "lucide-react";
 
 import { buttonVariants } from "../ui/button";
 
-function Sidebar({
+function DocumentSidebar({
   document,
   className,
 }: {
@@ -54,4 +61,33 @@ function Sidebar({
   );
 }
 
-export default Sidebar;
+function DocumentSidebarMobile({
+  document,
+  className,
+}: {
+  document: Document;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <Sheet>
+        <SheetTrigger
+          render={
+            <Button variant="ghost" size="icon" aria-label="Open navigation" />
+          }
+        >
+          <MenuIcon className="size-8" />
+        </SheetTrigger>
+        <SheetContent side="left" className="p-0">
+          <SheetTitle className="sr-only">{document.title}</SheetTitle>
+          <DocumentSidebar
+            document={document}
+            className="h-full w-full bg-card/80 py-5"
+          />
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
+
+export { DocumentSidebar, DocumentSidebarMobile };

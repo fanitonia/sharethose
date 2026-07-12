@@ -4,7 +4,7 @@ interface CreateDocumentRequest {
   title: string;
   slug: string;
   password?: string | null;
-  expireAt: Date | null;
+  expireAt: string | null;
   pages: CreatePageRequest[];
 }
 

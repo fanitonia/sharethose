@@ -1,4 +1,4 @@
-import { getProblemDetails } from "@api/problem-details";
+import { getProblemDetails } from "@/api/problem-details";
 
 type ProblemDetailsErrorProps = {
   error: unknown;
@@ -35,4 +35,4 @@ function ProblemDetailsError({
   );
 }
 
-export default ProblemDetailsError;
+export { ProblemDetailsError };

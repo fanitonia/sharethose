@@ -1,24 +1,28 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 
-import { apiClient } from "@lib/axios";
+import type { Document } from "@/api/contracts";
+import { apiClient } from "@/lib/axios";
 
-import type { Document } from "@api/contracts";
-
-function getDocumentFn(documentSlug: string) {
+function fetchDocument(documentSlug: string) {
   return apiClient
     .get<Document>(`api/documents/${documentSlug}`)
     .then((res) => res.data);
 }
 
-function getDocumentQueryOptions(documentSlug: string) {
+const documentKeys = {
+  document: (documentSlug: string) => ["document", documentSlug] as const,
+};
+
+function documentQueryOptions(documentSlug: string) {
   return queryOptions({
-    queryKey: ["document", documentSlug],
-    queryFn: () => getDocumentFn(documentSlug),
+    queryKey: documentKeys.document(documentSlug),
+    queryFn: () => fetchDocument(documentSlug),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
 
 function useGetDocument(documentSlug: string) {
-  return useQuery(getDocumentQueryOptions(documentSlug));
+  return useQuery(documentQueryOptions(documentSlug));
 }
 
-export { getDocumentFn, getDocumentQueryOptions, useGetDocument };
+export { fetchDocument, documentQueryOptions, useGetDocument };

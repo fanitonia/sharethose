@@ -7,12 +7,20 @@ import remarkGfm from "remark-gfm";
 import remarkIns from "remark-ins";
 import supersub from "remark-supersub";
 
-import { markdownComponents } from "./markdown-components";
+import { cn } from "@/lib/utils";
+
+import { markdownComponents } from "./markdown-elements";
 
 // TOOD: style containers
-function MarkdownRenderer({ markdown }: { markdown: string }) {
+function MarkdownRenderer({
+  markdown,
+  className,
+}: {
+  markdown: string;
+  className?: string;
+}) {
   return (
-    <div className="markdown-content max-w-full">
+    <div className={cn("markdown-content max-w-full", className)}>
       <Markdown
         remarkPlugins={[
           [remarkGfm, { singleTilde: false }],

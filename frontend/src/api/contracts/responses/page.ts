@@ -1,9 +1,9 @@
 interface Page {
   id: number;
-  createdAt: Date;
-  updatedAt: Date;
-  name: string;
+  createdAt: string;
+  updatedAt: string;
   slug: string;
+  name: string;
   content: string;
   pageNumber: number;
 }

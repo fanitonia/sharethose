@@ -6,15 +6,7 @@
   ],
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"],
-      "@api/*": ["./src/api/*"],
-      "@assets/*": ["./src/assets/*"],
-      "@components/*": ["./src/components/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@context/*": ["./src/context/*"],
-      "@type/*": ["./src/types/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@hooks/*": ["./src/hooks/*"]
+      "@/*": ["./src/*"]
     }
   }
 }

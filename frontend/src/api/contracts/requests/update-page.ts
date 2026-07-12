@@ -1,9 +1,7 @@
 interface UpdatePageRequest {
-  id?: string;
+  id?: number;
   name: string;
-  slug: string;
   content: string;
-  pageNumber: number;
 }
 
 export type { UpdatePageRequest };

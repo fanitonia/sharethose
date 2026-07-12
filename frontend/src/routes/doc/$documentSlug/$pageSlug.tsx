@@ -1,9 +1,10 @@
-import { createFileRoute, getRouteApi } from "@tanstack/react-router";
+import { createFileRoute, getRouteApi, notFound } from "@tanstack/react-router";
 
-import { PageView } from "@/components/document-viewer";
+import { DocumentPageContent } from "@/components/document";
 
 export const Route = createFileRoute("/doc/$documentSlug/$pageSlug")({
   component: RouteComponent,
+  notFoundComponent: () => <div>Page not found</div>,
 });
 
 const documentRoute = getRouteApi("/doc/$documentSlug");
@@ -14,19 +15,8 @@ function RouteComponent() {
   const page = document.pages.find((candidate) => candidate.slug === pageSlug);
 
   if (!page) {
-    return (
-      <div className="mx-auto h-full max-w-4xl min-w-0 p-5 sm:p-6 lg:p-8">
-        <div className="rounded-md border border-border p-4 text-sm text-muted-foreground">
-          Page not found.
-        </div>
-      </div>
-    );
+    throw notFound();
   }
 
-  return (
-    <PageView
-      page={page}
-      className="mx-auto h-full max-w-4xl min-w-0 p-5 sm:p-6 lg:p-8"
-    />
-  );
+  return <DocumentPageContent page={page} />;
 }
