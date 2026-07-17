@@ -39,7 +39,7 @@ public class DocumentCommandService(
             Pages = request.Pages.Select((p, index) => new Page
             {
                 Name = p.Name,
-                Slug = GenerateSlug(p.Name),
+                Slug = ConvertToSlug(p.Name),
                 Content = p.Content,
                 PageNumber = (ushort)(index + 1),
                 DocumentId = documentId
@@ -52,7 +52,9 @@ public class DocumentCommandService(
             : hasher.HashPassword(document, request.Password);
 
         context.Documents.Add(document);
+
         int result;
+
         try
         {
             result = await context.SaveChangesAsync();
@@ -145,7 +147,7 @@ public class DocumentCommandService(
                 if (existingPage.Name != pageRequest.Name)
                 {
                     existingPage.Name = pageRequest.Name;
-                    existingPage.Slug = GenerateSlug(pageRequest.Name);
+                    existingPage.Slug = ConvertToSlug(pageRequest.Name);
                     pageChanged = true;
                 }
 
@@ -172,7 +174,7 @@ public class DocumentCommandService(
                 document.Pages.Add(new Page
                 {
                     Name = pageRequest.Name,
-                    Slug = GenerateSlug(pageRequest.Name),
+                    Slug = ConvertToSlug(pageRequest.Name),
                     Content = pageRequest.Content,
                     PageNumber = pageNumber,
                     DocumentId = documentId
@@ -271,7 +273,7 @@ public class DocumentCommandService(
             != PasswordVerificationResult.Failed;
     }
 
-    private string GenerateSlug(string title)
+    private string ConvertToSlug(string title)
     {
         SlugHelper slugHelper = new SlugHelper();
         string slug = slugHelper.GenerateSlug(title);

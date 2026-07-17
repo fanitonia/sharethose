@@ -11,7 +11,6 @@ using Persistence;
 
 namespace Application.Features.Documents.Services;
 
-// TODO: a query service should not delete data, just return the error but delete the expired one in a background service
 public class DocumentQueryService(AppDbContext context, IPasswordHasher<Document> hasher) : IDocumentQueryService
 {
     public async Task<Result<DocumentResponse>> GetDocumentAsync(string documentSlug, string? password, CancellationToken ct)
