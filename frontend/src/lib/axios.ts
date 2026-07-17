@@ -1,4 +1,11 @@
-import axios from "axios";
+import type { ProblemDetails } from "@/types/api/problemDetails";
+import axios, { AxiosError } from "axios";
+
+declare module "@tanstack/react-query" {
+  interface Register {
+    defaultError: AxiosError<ProblemDetails>;
+  }
+}
 
 const rawApiUrl = import.meta.env.VITE_API_URL;
 

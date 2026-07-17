@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from "./routes/__root"
 import { Route as IndexRouteImport } from "./routes/index"
+import { Route as CreateIndexRouteImport } from "./routes/create/index"
 import { Route as DocDocumentSlugRouteRouteImport } from "./routes/doc/$documentSlug/route"
 import { Route as DocDocumentSlugIndexRouteImport } from "./routes/doc/$documentSlug/index"
 import { Route as DocDocumentSlugPageSlugRouteImport } from "./routes/doc/$documentSlug/$pageSlug"
@@ -17,6 +18,11 @@ import { Route as DocDocumentSlugPageSlugRouteImport } from "./routes/doc/$docum
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreateIndexRoute = CreateIndexRouteImport.update({
+  id: "/create/",
+  path: "/create/",
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocDocumentSlugRouteRoute = DocDocumentSlugRouteRouteImport.update({
@@ -38,11 +44,13 @@ const DocDocumentSlugPageSlugRoute = DocDocumentSlugPageSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
   "/doc/$documentSlug": typeof DocDocumentSlugRouteRouteWithChildren
+  "/create/": typeof CreateIndexRoute
   "/doc/$documentSlug/$pageSlug": typeof DocDocumentSlugPageSlugRoute
   "/doc/$documentSlug/": typeof DocDocumentSlugIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
+  "/create": typeof CreateIndexRoute
   "/doc/$documentSlug/$pageSlug": typeof DocDocumentSlugPageSlugRoute
   "/doc/$documentSlug": typeof DocDocumentSlugIndexRoute
 }
@@ -50,6 +58,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
   "/doc/$documentSlug": typeof DocDocumentSlugRouteRouteWithChildren
+  "/create/": typeof CreateIndexRoute
   "/doc/$documentSlug/$pageSlug": typeof DocDocumentSlugPageSlugRoute
   "/doc/$documentSlug/": typeof DocDocumentSlugIndexRoute
 }
@@ -58,14 +67,16 @@ export interface FileRouteTypes {
   fullPaths:
     | "/"
     | "/doc/$documentSlug"
+    | "/create/"
     | "/doc/$documentSlug/$pageSlug"
     | "/doc/$documentSlug/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/doc/$documentSlug/$pageSlug" | "/doc/$documentSlug"
+  to: "/" | "/create" | "/doc/$documentSlug/$pageSlug" | "/doc/$documentSlug"
   id:
     | "__root__"
     | "/"
     | "/doc/$documentSlug"
+    | "/create/"
     | "/doc/$documentSlug/$pageSlug"
     | "/doc/$documentSlug/"
   fileRoutesById: FileRoutesById
@@ -73,6 +84,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DocDocumentSlugRouteRoute: typeof DocDocumentSlugRouteRouteWithChildren
+  CreateIndexRoute: typeof CreateIndexRoute
 }
 
 declare module "@tanstack/react-router" {
@@ -82,6 +94,13 @@ declare module "@tanstack/react-router" {
       path: "/"
       fullPath: "/"
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    "/create/": {
+      id: "/create/"
+      path: "/create"
+      fullPath: "/create/"
+      preLoaderRoute: typeof CreateIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     "/doc/$documentSlug": {
@@ -124,6 +143,7 @@ const DocDocumentSlugRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DocDocumentSlugRouteRoute: DocDocumentSlugRouteRouteWithChildren,
+  CreateIndexRoute: CreateIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,11 +1,13 @@
-import { StrictMode } from "react";
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 
+import { StrictMode } from "react";
+
 import { ThemeProvider } from "@/context/ThemeProvider";
+
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -35,8 +37,10 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
         <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-          <ReactQueryDevtools initialIsOpen={false} />
+          <TooltipProvider>
+            <RouterProvider router={router} />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </TooltipProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </StrictMode>

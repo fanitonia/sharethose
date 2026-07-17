@@ -10,9 +10,7 @@ const RootLayout = () => (
 );
 
 // create a default notFoundComponent
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
-  {
-    component: RootLayout,
-    notFoundComponent: () => <div>404 Not Found</div>,
-  }
-);
+export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  component: RootLayout,
+  notFoundComponent: () => <div>404 Not Found</div>,
+});
