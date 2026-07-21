@@ -12,6 +12,7 @@ import { useState } from "react";
 
 import { useShareDocument } from "@/features/document/hooks/useShareDocument";
 import type { CreateDocumentRequest } from "@/features/document/types/api";
+import { AlertContainer } from "@/components/containers/AlertContainer";
 
 interface ShareDocumentButtonProps {
   document: CreateDocumentRequest;
@@ -57,18 +58,19 @@ function ShareDocumentButton({ document, onShared }: ShareDocumentButtonProps) {
             </DialogHeader>
             <div className="space-y-4">
               <CopyLinkInput value={documentUrl} />
-              {/* TODO: make this a generic warning component */}
-              <div className="space-y-2 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+              <AlertContainer>
                 <p>
                   Keep this edit key safe. It is required to edit your document and cannot be
                   recovered.
                 </p>
                 <CopyLinkInput
                   className="text-foreground"
-                  value={sharedDocument !== null ? sharedDocument.editKey : ""}
+                  value={
+                    sharedDocument !== null ? sharedDocument.editKey : "This should never happen"
+                  }
                   hideValue
                 />
-              </div>
+              </AlertContainer>
             </div>
           </DialogContent>
         ) : (

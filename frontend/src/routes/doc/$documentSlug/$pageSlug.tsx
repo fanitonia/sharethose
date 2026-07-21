@@ -3,10 +3,9 @@ import { createFileRoute, getRouteApi, notFound } from "@tanstack/react-router";
 import { MarkdownRenderer } from "@/features/document/components/MarkdownRenderer";
 import { NotFound } from "@/components/feedback/empty/NotFound";
 
-// TODO: create not found component for pages
 export const Route = createFileRoute("/doc/$documentSlug/$pageSlug")({
   component: RouteComponent,
-  notFoundComponent: () => <NotFound />,
+  notFoundComponent: () => <NotFound className="m-auto" />,
 });
 
 const documentRoute = getRouteApi("/doc/$documentSlug");

@@ -7,7 +7,7 @@ type ProblemDetailsErrorProps = {
   className?: string;
 };
 
-// TODO: improve ProblemDetailsError
+// mostly for debugging, i'm not sure if this is suitable for users
 function ProblemDetailsError({
   error,
   fallbackMessage = "Something went wrong.",

@@ -6,6 +6,7 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import { toast } from "sonner";
 
 interface CopyLinkInputProps {
   value: string;
@@ -20,11 +21,11 @@ const CopyLinkInput = ({ value, onCopy, className, hideValue }: CopyLinkInputPro
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(value);
-      setCopied(true);
       onCopy?.();
+      setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // TODO: handle error and show a toast notification
+      toast.error("Failed to copy to clipboard");
     }
   };
 

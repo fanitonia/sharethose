@@ -19,8 +19,8 @@ function NotFound({ title, description, content, className }: NotFoundProps) {
   return (
     <Empty className={className}>
       <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <CircleAlert />
+        <EmptyMedia variant="icon" className="size-10 bg-transparent">
+          <CircleAlert className="size-10" />
         </EmptyMedia>
         <EmptyTitle>{title ?? "404 - Not Found"}</EmptyTitle>
         <EmptyDescription>

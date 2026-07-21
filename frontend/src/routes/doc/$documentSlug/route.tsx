@@ -39,7 +39,7 @@ function RouteComponent() {
         />
 
         {/* page view */}
-        <div className="h-full max-w-4xl min-w-0 grow p-5 sm:p-6 lg:p-8">
+        <div className="flex h-screen max-w-4xl min-w-0 grow p-5 sm:p-6 lg:p-8">
           <Outlet />
         </div>
       </div>
