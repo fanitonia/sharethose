@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
-import { ProblemDetailsError } from "@/components/feedback/errors/ProblemDetailsError";
+import { ProblemDetailsError } from "@/components/feedback/error/ProblemDetailsError";
 
 import { documentQueryOptions } from "@/features/document/api";
 import {

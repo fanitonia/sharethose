@@ -12,16 +12,16 @@ function useShareDocument(onSuccess?: () => void) {
     setError(null);
     createDocument.mutate(document, {
       onSuccess: (data) => {
-        setSharedDocument(data);
         onSuccess?.();
+        setSharedDocument(data);
       },
       onError: setError,
     });
   }
 
   function reset() {
-    setSharedDocument(null);
     setError(null);
+    setSharedDocument(null);
   }
 
   return {
