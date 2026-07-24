@@ -2,12 +2,15 @@ import { createContext, useContext } from "react";
 
 import { useDocumentDraft } from "@/features/document/hooks/useDocumentDraft";
 import type { DocumentDraft, DraftPage } from "@/features/document/types/draft";
+import type { DraftValidationErrors } from "@/features/document/types/validation";
 
 interface DocumentEditorContextValue {
   draft: DocumentDraft;
   title: string;
   pages: DraftPage[];
   selectedPageIndex: number;
+  validationErrors: DraftValidationErrors;
+  validate: () => boolean;
   clearDraft: () => void;
   setTitle: (title: string) => void;
   renamePage: (index: number, name: string) => void;

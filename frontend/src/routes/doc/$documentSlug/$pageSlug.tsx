@@ -1,7 +1,8 @@
 import { createFileRoute, getRouteApi, notFound } from "@tanstack/react-router";
 
-import { MarkdownRenderer } from "@/features/document/components/MarkdownRenderer";
 import { NotFound } from "@/components/feedback/empty/NotFound";
+
+import { MarkdownRenderer } from "@/features/document/components/MarkdownRenderer";
 
 export const Route = createFileRoute("/doc/$documentSlug/$pageSlug")({
   component: RouteComponent,

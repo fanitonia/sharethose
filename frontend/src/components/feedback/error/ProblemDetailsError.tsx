@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
 import { getProblemDetails } from "@/utilities/getProblemDetails";
+
+import { cn } from "@/lib/utils";
 
 type ProblemDetailsErrorProps = {
   error: unknown;

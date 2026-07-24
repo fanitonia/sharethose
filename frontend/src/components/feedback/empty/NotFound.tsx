@@ -1,3 +1,5 @@
+import { CircleAlert } from "lucide-react";
+
 import {
   Empty,
   EmptyContent,
@@ -6,7 +8,6 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { CircleAlert } from "lucide-react";
 
 interface NotFoundProps {
   title?: string;

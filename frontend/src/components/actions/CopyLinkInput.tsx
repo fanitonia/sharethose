@@ -1,12 +1,15 @@
-import { CheckIcon, CopyIcon } from "lucide-react";
+import { toast } from "sonner";
+
 import { useState } from "react";
+
+import { CheckIcon, CopyIcon } from "lucide-react";
+
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { toast } from "sonner";
 
 interface CopyLinkInputProps {
   value: string;

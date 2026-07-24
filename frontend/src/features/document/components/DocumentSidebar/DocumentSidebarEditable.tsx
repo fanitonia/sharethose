@@ -19,13 +19,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { MAX_PAGE_COUNT } from "@/features/document/constants";
 import { useDocumentEditor } from "@/features/document/context/DocumentEditorContext";
 import { useInlineEdit } from "@/features/document/hooks/useInlineEdit";
+import { PAGE_NAME_MAX_LENGTH, TITLE_MAX_LENGTH } from "@/features/document/types/validation";
 
 interface EditorSidebarProps {
   className?: string;
   onPageSelect?: () => void;
 }
-// TODO: we shouldn't be able to create pages with the same name, implement a form validation
-// TODO: pages should have a default name
 // TODO: we should be able to reorder pages with drag and drop
 function DocumentSidebarEditable({ className, onPageSelect }: EditorSidebarProps) {
   return (
@@ -51,6 +50,7 @@ function EditorTitleHeader() {
           aria-label="Rename document"
           className="w-full bg-transparent px-10 text-center text-2xl font-semibold text-foreground outline"
           value={edit.value}
+          maxLength={TITLE_MAX_LENGTH}
           onChange={(event) => edit.setValue(event.target.value)}
           onBlur={edit.commit}
           onKeyDown={(event) => {
@@ -65,8 +65,13 @@ function EditorTitleHeader() {
       ) : (
         <div className="flex justify-center">
           <div className="relative flex-1">
-            <h1 className="px-6 text-center text-2xl font-semibold wrap-break-word text-foreground">
-              {title}
+            <h1
+              className={cn(
+                "px-6 text-center text-2xl font-semibold wrap-break-word text-foreground",
+                !title && "text-destructive"
+              )}
+            >
+              {title || "Please enter a title"}
             </h1>
             <Tooltip>
               <TooltipTrigger
@@ -136,7 +141,7 @@ function EditorPageList({ onPageSelect }: Pick<EditorSidebarProps, "onPageSelect
 
   function startRenaming(index: number) {
     setEditingPageIndex(index);
-    edit.start(pages[index].name || `Page ${index + 1}`);
+    edit.start(pages[index].name || "");
   }
 
   return (
@@ -146,62 +151,68 @@ function EditorPageList({ onPageSelect }: Pick<EditorSidebarProps, "onPageSelect
           <li
             key={page.id}
             className={cn(
-              "group relative flex w-full items-center hover:bg-secondary",
+              "group relative flex w-full flex-col hover:bg-secondary",
               index === selectedPageIndex && "bg-secondary"
             )}
           >
-            {editingPageIndex === index ? (
-              <input
-                autoFocus
-                aria-label={`Rename page ${index + 1}`}
-                className="min-w-0 flex-1 bg-transparent px-3 py-2 text-center text-sm outline"
-                value={edit.value}
-                onChange={(event) => edit.setValue(event.target.value)}
-                onBlur={edit.commit}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    edit.commit();
+            <div className="relative flex w-full items-center">
+              {editingPageIndex === index ? (
+                <input
+                  autoFocus
+                  aria-label={`Rename page ${index + 1}`}
+                  className="min-w-0 flex-1 bg-transparent px-3 py-2 text-center text-sm outline"
+                  value={edit.value}
+                  maxLength={PAGE_NAME_MAX_LENGTH}
+                  onChange={(event) => edit.setValue(event.target.value)}
+                  onBlur={edit.commit}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      edit.commit();
+                    }
+                    if (event.key === "Escape") {
+                      edit.cancel();
+                    }
+                  }}
+                />
+              ) : (
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "min-w-0 flex-1 justify-center rounded-none px-0 text-center",
+                    !page.name && "text-destructive"
+                  )}
+                  onClick={() => {
+                    selectPage(index);
+                    onPageSelect?.();
+                  }}
+                >
+                  {page.name || "Please enter a page name"}
+                </Button>
+              )}
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-1 text-white opacity-100 transition-opacity group-hover:text-muted-foreground group-hover:opacity-100 hover:bg-transparent focus-visible:opacity-100 lg:opacity-0"
+                    />
                   }
-                  if (event.key === "Escape") {
-                    edit.cancel();
-                  }
-                }}
-              />
-            ) : (
-              <Button
-                variant="ghost"
-                className="min-w-0 flex-1 justify-center rounded-none px-0 text-center"
-                onClick={() => {
-                  selectPage(index);
-                  onPageSelect?.();
-                }}
-              >
-                {page.name || `Page ${index + 1}`}
-              </Button>
-            )}
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 text-white opacity-100 transition-opacity group-hover:text-muted-foreground group-hover:opacity-100 hover:bg-transparent focus-visible:opacity-100 lg:opacity-0"
-                  />
-                }
-              >
-                <Ellipsis className="size-5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => startRenaming(index)}>
-                  <Pencil className="mr-1" />
-                  Rename
-                </DropdownMenuItem>
-                <DropdownMenuItem variant="destructive" onClick={() => deletePage(index)}>
-                  <Trash2Icon className="mr-1" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                >
+                  <Ellipsis className="size-5" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => startRenaming(index)}>
+                    <Pencil className="mr-1" />
+                    Rename
+                  </DropdownMenuItem>
+                  <DropdownMenuItem variant="destructive" onClick={() => deletePage(index)}>
+                    <Trash2Icon className="mr-1" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </li>
         ))}
       </ul>

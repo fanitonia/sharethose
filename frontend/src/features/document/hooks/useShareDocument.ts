@@ -1,36 +1,65 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useCreateDocument } from "@/features/document/api";
-import type { CreateDocumentRequest, DocumentWithKey } from "@/features/document/types/api";
+import type { DocumentWithKey } from "@/features/document/types/api";
+import type { DocumentDraft } from "@/features/document/types/draft";
+import { convertToCreateDocumentRequest } from "@/features/document/types/draft";
+import { validateDraft } from "@/features/document/types/validation";
+import { getValidationErrorGroups } from "@/features/document/utils/getValidationErrorGroups";
 
-function useShareDocument(onSuccess?: () => void) {
+type ShareDialogState = "idle" | "validation" | "result";
+
+interface UseShareDocumentOptions {
+  onSuccess?: () => void;
+}
+
+function useShareDocument(draft: DocumentDraft, options?: UseShareDocumentOptions) {
   const createDocument = useCreateDocument();
+  const [dialogState, setDialogState] = useState<ShareDialogState>("idle");
   const [sharedDocument, setSharedDocument] = useState<DocumentWithKey | null>(null);
   const [error, setError] = useState<unknown>(null);
 
-  function share(document: CreateDocumentRequest) {
+  const validationErrors = useMemo(
+    () => getValidationErrorGroups(validateDraft(draft).errors),
+    [draft]
+  );
+
+  function share() {
+    if (!validateDraft(draft).success) {
+      setDialogState("validation");
+      return;
+    }
+
     setError(null);
-    createDocument.mutate(document, {
+    createDocument.mutate(convertToCreateDocumentRequest(draft), {
       onSuccess: (data) => {
-        onSuccess?.();
+        options?.onSuccess?.();
         setSharedDocument(data);
+        setDialogState("result");
       },
-      onError: setError,
+      onError: (mutationError) => {
+        setError(mutationError);
+        setDialogState("result");
+      },
     });
   }
 
   function reset() {
+    setDialogState("idle");
     setError(null);
     setSharedDocument(null);
   }
 
   return {
     share,
+    dialogState,
     sharedDocument,
     error,
+    validationErrors,
     isPending: createDocument.isPending,
     reset,
   };
 }
 
 export { useShareDocument };
+export type { ShareDialogState };

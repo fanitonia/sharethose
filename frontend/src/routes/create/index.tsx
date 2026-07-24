@@ -10,7 +10,6 @@ import {
   DocumentEditorProvider,
   useDocumentEditor,
 } from "@/features/document/context/DocumentEditorContext";
-import { convertToCreateDocumentRequest } from "@/features/document/types/draft";
 
 export const Route = createFileRoute("/create/")({
   component: RouteComponent,
@@ -25,7 +24,7 @@ function RouteComponent() {
 }
 
 function CreateDocumentEditor() {
-  const { draft, clearDraft, updatePageContent } = useDocumentEditor();
+  const { draft, updatePageContent } = useDocumentEditor();
   const selectedPage = draft.pages[draft.selectedPageIndex];
 
   return (
@@ -38,10 +37,7 @@ function CreateDocumentEditor() {
         <DocumentSidebarEditable className="hidden h-screen w-72 shrink-0 justify-center bg-card/80 py-5 lg:sticky lg:top-0 lg:flex xl:w-80" />
         <div className="flex h-full flex-1 flex-col">
           <div className="flex items-center border bg-card px-4 py-4">
-            <ShareDocumentButton
-              document={convertToCreateDocumentRequest(draft)}
-              onShared={clearDraft}
-            />
+            <ShareDocumentButton />
           </div>
           <MarkdownEditor
             className="min-h-0 flex-1"

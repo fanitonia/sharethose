@@ -1,5 +1,6 @@
-import { Item, ItemContent } from "@/components/ui/item";
 import { cn } from "@/lib/utils";
+
+import { Item, ItemContent } from "@/components/ui/item";
 
 interface AlertContainerProps {
   children: React.ReactNode;
@@ -9,7 +10,7 @@ interface AlertContainerProps {
 function AlertContainer({ children, className }: AlertContainerProps) {
   return (
     <Item
-      className={cn("border border-destructive/30 bg-destructive/10 text-destructive", className)}
+      className={cn("border border-destructive/20 bg-destructive/5 text-destructive", className)}
     >
       <ItemContent className="space-y-2">{children}</ItemContent>
     </Item>

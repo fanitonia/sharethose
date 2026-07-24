@@ -1,7 +1,8 @@
-import { useEffect, useReducer, useRef } from "react";
+import { useEffect, useMemo, useReducer, useRef } from "react";
 
 import { MAX_PAGE_COUNT } from "@/features/document/constants";
 import type { DocumentDraft, DraftPage } from "@/features/document/types/draft";
+import { validateDraft } from "@/features/document/types/validation";
 
 const draftStorageKey = "draft-document";
 
@@ -16,14 +17,14 @@ type DraftAction =
 function createPage(): DraftPage {
   return {
     id: crypto.randomUUID(),
-    name: "",
+    name: "Untitled Page",
     content: "",
   };
 }
 
 function createEmptyDraft(): DocumentDraft {
   return {
-    title: "Untitled",
+    title: "Untitled Document",
     pages: [createPage()],
     selectedPageIndex: 0,
   };
@@ -133,6 +134,7 @@ function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
 function useDocumentDraft() {
   const [draft, dispatch] = useReducer(reducer, undefined, loadDraft);
   const persistenceVersion = useRef(0);
+  const validationErrors = useMemo(() => validateDraft(draft).errors, [draft]);
 
   useEffect(() => {
     const version = persistenceVersion.current;
@@ -150,8 +152,14 @@ function useDocumentDraft() {
     localStorage.removeItem(draftStorageKey);
   }
 
+  function validate() {
+    return validateDraft(draft).success;
+  }
+
   return {
     draft,
+    validationErrors,
+    validate,
     clearDraft,
     setTitle: (title: string) => dispatch({ type: "SET_TITLE", title }),
     renamePage: (index: number, name: string) => dispatch({ type: "RENAME_PAGE", index, name }),
