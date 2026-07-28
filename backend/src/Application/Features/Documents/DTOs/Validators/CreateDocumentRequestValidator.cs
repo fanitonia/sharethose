@@ -11,7 +11,7 @@ public class CreateDocumentRequestValidator : AbstractValidator<CreateDocumentRe
             .NotEmpty()
                 .WithMessage("Title is required.")
             .MaximumLength(100)
-                .WithMessage("Title must not exceed 100 characters.");
+                .WithMessage("Title must not exceed 50 characters.");
 
         RuleFor(q => q.Slug)
             .NotEmpty()

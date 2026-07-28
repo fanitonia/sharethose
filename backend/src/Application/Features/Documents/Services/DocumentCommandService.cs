@@ -16,7 +16,8 @@ namespace Application.Features.Documents.Services;
 
 public class DocumentCommandService(
     AppDbContext context,
-    IPasswordHasher<Document> hasher) : IDocumentCommandService
+    IPasswordHasher<Document> hasher,
+    IDocumentHelperService documentHelper) : IDocumentCommandService
 {
     ShortIdOptions idOptions = new ShortIdOptions(
         useNumbers: true, useSpecialCharacters: false, length: 15
@@ -83,7 +84,7 @@ public class DocumentCommandService(
         if (document is null)
             return CommonErrors.NotFound;
 
-        if (editKey is not null && !IsEditKeyValid(document, editKey))
+        if (editKey is not null && !documentHelper.IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
         context.Documents.Remove(document);
@@ -104,7 +105,7 @@ public class DocumentCommandService(
         if (document is null)
             return CommonErrors.NotFound;
 
-        if (!IsEditKeyValid(document, editKey))
+        if (!documentHelper.IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
         var existingPagesById = document.Pages.ToDictionary(page => page.Id);
@@ -204,7 +205,7 @@ public class DocumentCommandService(
         if (document == null)
             return CommonErrors.NotFound;
 
-        if (!IsEditKeyValid(document, editKey))
+        if (!documentHelper.IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
         if (document.ExpireAt == request.ExpireAt)
@@ -231,7 +232,7 @@ public class DocumentCommandService(
         if (document == null)
             return CommonErrors.NotFound;
 
-        if (!IsEditKeyValid(document, editKey))
+        if (!documentHelper.IsEditKeyValid(document, editKey))
             return DocumentErrors.InvalidEditKey;
 
         if (request.Password is null)
@@ -246,7 +247,7 @@ public class DocumentCommandService(
             return Result.Success();
         }
 
-        if (IsPasswordValid(document, request.Password))
+        if (documentHelper.IsPasswordValid(document, request.Password))
             return DocumentErrors.NoChangesFound;
 
         document.PasswordHash = hasher.HashPassword(document, request.Password);
@@ -258,19 +259,6 @@ public class DocumentCommandService(
             return CommonErrors.FailedToUpdate;
 
         return Result.Success();
-    }
-
-    private bool IsEditKeyValid(Document document, string editKey)
-    {
-        return hasher.VerifyHashedPassword(document, document.EditKeyHash, editKey)
-            != PasswordVerificationResult.Failed;
-    }
-
-    private bool IsPasswordValid(Document document, string password)
-    {
-        return document.PasswordHash is not null &&
-            hasher.VerifyHashedPassword(document, document.PasswordHash, password)
-            != PasswordVerificationResult.Failed;
     }
 
     private string ConvertToSlug(string title)

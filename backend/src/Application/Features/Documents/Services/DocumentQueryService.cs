@@ -11,7 +11,10 @@ using Persistence;
 
 namespace Application.Features.Documents.Services;
 
-public class DocumentQueryService(AppDbContext context, IPasswordHasher<Document> hasher) : IDocumentQueryService
+public class DocumentQueryService(
+    AppDbContext context,
+    IPasswordHasher<Document> hasher,
+    IDocumentHelperService documentHelper) : IDocumentQueryService
 {
     public async Task<Result<DocumentResponse>> GetDocumentAsync(string documentSlug, string? password, CancellationToken ct)
     {
@@ -41,6 +44,22 @@ public class DocumentQueryService(AppDbContext context, IPasswordHasher<Document
         return await context.Documents
             .AsNoTracking()
             .AnyAsync(d => d.Slug == documentSlug, ct);
+    }
+
+    public async Task<Result> ValidateDocumentKeyAsync(Guid documentId, string editKey, CancellationToken ct)
+    {
+        var document = await context.Documents
+            .AsNoTracking()
+            .Where(d => d.Id == documentId)
+            .FirstOrDefaultAsync(ct);
+
+        if (document is null)
+            return CommonErrors.NotFound;
+
+        if (!documentHelper.IsEditKeyValid(document, editKey))
+            return DocumentErrors.InvalidEditKey;
+
+        return Result.Success();
     }
 
     private bool IsPasswordValid(Document document, string? password)

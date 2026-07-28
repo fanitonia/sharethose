@@ -10,7 +10,7 @@ public class ExpiredDocumentCleaner(
     IServiceScopeFactory scopeFactory,
     ILogger<ExpiredDocumentCleaner> logger) : BackgroundService
 {
-    private static readonly TimeSpan CleanupInterval = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan CleanupInterval = TimeSpan.FromMinutes(30);
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await CleanupAsync(stoppingToken);

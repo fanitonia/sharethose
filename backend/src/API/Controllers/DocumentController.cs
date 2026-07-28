@@ -67,7 +67,7 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
         return Ok(result.Value);
     }
 
-    [HttpPatch("{id}/expire-date")]
+    [HttpPatch("{id}/expire")]
     public async Task<ActionResult<DocumentResponse>> UpdateDocumentExpireDate([FromBody] UpdateDocumentExpireDateRequest request, [FromRoute] Guid id, [FromHeader(Name = "X-Document-Key")] string editKey)
     {
         var result = await command.UpdateDocumentExpireDateAsync(request, id, editKey);
@@ -84,6 +84,19 @@ public class DocumentController(IDocumentQueryService query, IDocumentCommandSer
     public async Task<ActionResult> UpdateDocumentPassword([FromBody] UpdateDocumentPasswordRequest request, [FromRoute] Guid id, [FromHeader(Name = "X-Document-Key")] string editKey)
     {
         var result = await command.UpdateDocumentPasswordAsync(request, id, editKey);
+
+        if (result.IsFailure)
+        {
+            return result.ToProblemDetails(HttpContext);
+        }
+
+        return NoContent();
+    }
+
+    [HttpPost("{id}/validate-key")]
+    public async Task<ActionResult> ValidateDocumentKey([FromRoute] Guid id, [FromHeader(Name = "X-Document-Key")] string editKey, CancellationToken ct)
+    {
+        var result = await query.ValidateDocumentKeyAsync(id, editKey, ct);
 
         if (result.IsFailure)
         {
