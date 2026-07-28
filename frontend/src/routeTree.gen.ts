@@ -13,7 +13,10 @@ import { Route as IndexRouteImport } from "./routes/index"
 import { Route as CreateIndexRouteImport } from "./routes/create/index"
 import { Route as DocDocumentSlugRouteRouteImport } from "./routes/doc/$documentSlug/route"
 import { Route as DocDocumentSlugIndexRouteImport } from "./routes/doc/$documentSlug/index"
-import { Route as DocDocumentSlugPageSlugRouteImport } from "./routes/doc/$documentSlug/$pageSlug"
+import { Route as DocDocumentSlugPageRouteRouteImport } from "./routes/doc/$documentSlug/page/route"
+import { Route as DocDocumentSlugPageIndexRouteImport } from "./routes/doc/$documentSlug/page/index"
+import { Route as DocDocumentSlugEditIndexRouteImport } from "./routes/doc/$documentSlug/edit/index"
+import { Route as DocDocumentSlugPagePageSlugRouteImport } from "./routes/doc/$documentSlug/page/$pageSlug"
 
 const IndexRoute = IndexRouteImport.update({
   id: "/",
@@ -35,32 +38,59 @@ const DocDocumentSlugIndexRoute = DocDocumentSlugIndexRouteImport.update({
   path: "/",
   getParentRoute: () => DocDocumentSlugRouteRoute,
 } as any)
-const DocDocumentSlugPageSlugRoute = DocDocumentSlugPageSlugRouteImport.update({
-  id: "/$pageSlug",
-  path: "/$pageSlug",
-  getParentRoute: () => DocDocumentSlugRouteRoute,
-} as any)
+const DocDocumentSlugPageRouteRoute =
+  DocDocumentSlugPageRouteRouteImport.update({
+    id: "/page",
+    path: "/page",
+    getParentRoute: () => DocDocumentSlugRouteRoute,
+  } as any)
+const DocDocumentSlugPageIndexRoute =
+  DocDocumentSlugPageIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => DocDocumentSlugPageRouteRoute,
+  } as any)
+const DocDocumentSlugEditIndexRoute =
+  DocDocumentSlugEditIndexRouteImport.update({
+    id: "/edit/",
+    path: "/edit/",
+    getParentRoute: () => DocDocumentSlugRouteRoute,
+  } as any)
+const DocDocumentSlugPagePageSlugRoute =
+  DocDocumentSlugPagePageSlugRouteImport.update({
+    id: "/$pageSlug",
+    path: "/$pageSlug",
+    getParentRoute: () => DocDocumentSlugPageRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
   "/doc/$documentSlug": typeof DocDocumentSlugRouteRouteWithChildren
   "/create/": typeof CreateIndexRoute
-  "/doc/$documentSlug/$pageSlug": typeof DocDocumentSlugPageSlugRoute
+  "/doc/$documentSlug/page": typeof DocDocumentSlugPageRouteRouteWithChildren
   "/doc/$documentSlug/": typeof DocDocumentSlugIndexRoute
+  "/doc/$documentSlug/page/$pageSlug": typeof DocDocumentSlugPagePageSlugRoute
+  "/doc/$documentSlug/edit/": typeof DocDocumentSlugEditIndexRoute
+  "/doc/$documentSlug/page/": typeof DocDocumentSlugPageIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
   "/create": typeof CreateIndexRoute
-  "/doc/$documentSlug/$pageSlug": typeof DocDocumentSlugPageSlugRoute
   "/doc/$documentSlug": typeof DocDocumentSlugIndexRoute
+  "/doc/$documentSlug/page/$pageSlug": typeof DocDocumentSlugPagePageSlugRoute
+  "/doc/$documentSlug/edit": typeof DocDocumentSlugEditIndexRoute
+  "/doc/$documentSlug/page": typeof DocDocumentSlugPageIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   "/": typeof IndexRoute
   "/doc/$documentSlug": typeof DocDocumentSlugRouteRouteWithChildren
   "/create/": typeof CreateIndexRoute
-  "/doc/$documentSlug/$pageSlug": typeof DocDocumentSlugPageSlugRoute
+  "/doc/$documentSlug/page": typeof DocDocumentSlugPageRouteRouteWithChildren
   "/doc/$documentSlug/": typeof DocDocumentSlugIndexRoute
+  "/doc/$documentSlug/page/$pageSlug": typeof DocDocumentSlugPagePageSlugRoute
+  "/doc/$documentSlug/edit/": typeof DocDocumentSlugEditIndexRoute
+  "/doc/$documentSlug/page/": typeof DocDocumentSlugPageIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -68,17 +98,29 @@ export interface FileRouteTypes {
     | "/"
     | "/doc/$documentSlug"
     | "/create/"
-    | "/doc/$documentSlug/$pageSlug"
+    | "/doc/$documentSlug/page"
     | "/doc/$documentSlug/"
+    | "/doc/$documentSlug/page/$pageSlug"
+    | "/doc/$documentSlug/edit/"
+    | "/doc/$documentSlug/page/"
   fileRoutesByTo: FileRoutesByTo
-  to: "/" | "/create" | "/doc/$documentSlug/$pageSlug" | "/doc/$documentSlug"
+  to:
+    | "/"
+    | "/create"
+    | "/doc/$documentSlug"
+    | "/doc/$documentSlug/page/$pageSlug"
+    | "/doc/$documentSlug/edit"
+    | "/doc/$documentSlug/page"
   id:
     | "__root__"
     | "/"
     | "/doc/$documentSlug"
     | "/create/"
-    | "/doc/$documentSlug/$pageSlug"
+    | "/doc/$documentSlug/page"
     | "/doc/$documentSlug/"
+    | "/doc/$documentSlug/page/$pageSlug"
+    | "/doc/$documentSlug/edit/"
+    | "/doc/$documentSlug/page/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,24 +159,63 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DocDocumentSlugIndexRouteImport
       parentRoute: typeof DocDocumentSlugRouteRoute
     }
-    "/doc/$documentSlug/$pageSlug": {
-      id: "/doc/$documentSlug/$pageSlug"
-      path: "/$pageSlug"
-      fullPath: "/doc/$documentSlug/$pageSlug"
-      preLoaderRoute: typeof DocDocumentSlugPageSlugRouteImport
+    "/doc/$documentSlug/page": {
+      id: "/doc/$documentSlug/page"
+      path: "/page"
+      fullPath: "/doc/$documentSlug/page"
+      preLoaderRoute: typeof DocDocumentSlugPageRouteRouteImport
       parentRoute: typeof DocDocumentSlugRouteRoute
+    }
+    "/doc/$documentSlug/page/": {
+      id: "/doc/$documentSlug/page/"
+      path: "/"
+      fullPath: "/doc/$documentSlug/page/"
+      preLoaderRoute: typeof DocDocumentSlugPageIndexRouteImport
+      parentRoute: typeof DocDocumentSlugPageRouteRoute
+    }
+    "/doc/$documentSlug/edit/": {
+      id: "/doc/$documentSlug/edit/"
+      path: "/edit"
+      fullPath: "/doc/$documentSlug/edit/"
+      preLoaderRoute: typeof DocDocumentSlugEditIndexRouteImport
+      parentRoute: typeof DocDocumentSlugRouteRoute
+    }
+    "/doc/$documentSlug/page/$pageSlug": {
+      id: "/doc/$documentSlug/page/$pageSlug"
+      path: "/$pageSlug"
+      fullPath: "/doc/$documentSlug/page/$pageSlug"
+      preLoaderRoute: typeof DocDocumentSlugPagePageSlugRouteImport
+      parentRoute: typeof DocDocumentSlugPageRouteRoute
     }
   }
 }
 
+interface DocDocumentSlugPageRouteRouteChildren {
+  DocDocumentSlugPagePageSlugRoute: typeof DocDocumentSlugPagePageSlugRoute
+  DocDocumentSlugPageIndexRoute: typeof DocDocumentSlugPageIndexRoute
+}
+
+const DocDocumentSlugPageRouteRouteChildren: DocDocumentSlugPageRouteRouteChildren =
+  {
+    DocDocumentSlugPagePageSlugRoute: DocDocumentSlugPagePageSlugRoute,
+    DocDocumentSlugPageIndexRoute: DocDocumentSlugPageIndexRoute,
+  }
+
+const DocDocumentSlugPageRouteRouteWithChildren =
+  DocDocumentSlugPageRouteRoute._addFileChildren(
+    DocDocumentSlugPageRouteRouteChildren,
+  )
+
 interface DocDocumentSlugRouteRouteChildren {
-  DocDocumentSlugPageSlugRoute: typeof DocDocumentSlugPageSlugRoute
+  DocDocumentSlugPageRouteRoute: typeof DocDocumentSlugPageRouteRouteWithChildren
   DocDocumentSlugIndexRoute: typeof DocDocumentSlugIndexRoute
+  DocDocumentSlugEditIndexRoute: typeof DocDocumentSlugEditIndexRoute
 }
 
 const DocDocumentSlugRouteRouteChildren: DocDocumentSlugRouteRouteChildren = {
-  DocDocumentSlugPageSlugRoute: DocDocumentSlugPageSlugRoute,
+  DocDocumentSlugPageRouteRoute: DocDocumentSlugPageRouteRouteWithChildren,
   DocDocumentSlugIndexRoute: DocDocumentSlugIndexRoute,
+  DocDocumentSlugEditIndexRoute: DocDocumentSlugEditIndexRoute,
 }
 
 const DocDocumentSlugRouteRouteWithChildren =

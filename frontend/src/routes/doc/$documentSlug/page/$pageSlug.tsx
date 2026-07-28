@@ -4,7 +4,7 @@ import { NotFound } from "@/components/feedback/empty/NotFound";
 
 import { MarkdownRenderer } from "@/features/document/components/MarkdownRenderer";
 
-export const Route = createFileRoute("/doc/$documentSlug/$pageSlug")({
+export const Route = createFileRoute("/doc/$documentSlug/page/$pageSlug")({
   component: RouteComponent,
   notFoundComponent: () => <NotFound className="m-auto" />,
 });

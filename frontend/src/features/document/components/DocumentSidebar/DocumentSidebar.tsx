@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Settings } from "lucide-react";
 
 import { useState } from "react";
 
@@ -33,7 +34,7 @@ function DocumentSidebar({ document, onPageSelect, className }: DocumentSidebarP
             {document.pages.map((page) => (
               <li key={page.id} className="flex w-full">
                 <Link
-                  to="/doc/$documentSlug/$pageSlug"
+                  to="/doc/$documentSlug/page/$pageSlug"
                   params={{
                     documentSlug: document.slug,
                     pageSlug: page.slug,
@@ -72,12 +73,12 @@ function DocumentSidebarMobile({ document, className }: DocumentSidebarMobilePro
         <SheetTrigger render={<Button variant="ghost" size="icon" aria-label="Open navigation" />}>
           <MenuIcon className="size-8" />
         </SheetTrigger>
-        <SheetContent side="left" className="p-0">
+        <SheetContent side="left">
           <SheetTitle className="sr-only">{document.title}</SheetTitle>
           <DocumentSidebar
             document={document}
             onPageSelect={() => setOpen(false)}
-            className="h-full w-full bg-card/80 py-5"
+            className="h-full w-full py-5"
           />
         </SheetContent>
       </Sheet>

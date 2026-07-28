@@ -39,7 +39,7 @@ if (!rootElement.innerHTML) {
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <RouterProvider router={router} />
-            <ReactQueryDevtools initialIsOpen={false} />
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
           </TooltipProvider>
         </QueryClientProvider>
       </ThemeProvider>

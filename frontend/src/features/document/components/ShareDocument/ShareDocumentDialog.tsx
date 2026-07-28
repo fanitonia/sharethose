@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import type { ShareDialogState } from "@/features/document/hooks/useShareDocument";
 import type { DocumentWithKey } from "@/features/document/types/api";
