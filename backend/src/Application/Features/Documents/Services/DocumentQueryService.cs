@@ -33,8 +33,6 @@ public class DocumentQueryService(
         if (!IsPasswordValid(document, password))
             return DocumentErrors.InvalidPassword;
 
-        document.Pages = document.Pages.OrderBy(p => p.PageNumber).ThenBy(p => p.Id).ToList();
-
         return new DocumentResponse(document);
 
     }

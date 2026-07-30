@@ -38,6 +38,6 @@ public class DocumentResponse
             Name = p.Name,
             Content = p.Content,
             PageNumber = p.PageNumber
-        }).ToList();
+        }).OrderBy(p => p.PageNumber).ThenBy(p => p.Id).ToList();
     }
 }
