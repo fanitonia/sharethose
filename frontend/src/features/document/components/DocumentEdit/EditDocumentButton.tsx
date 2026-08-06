@@ -31,7 +31,7 @@ function EditDocumentButton({ document, className }: EditDocumentButtonProps) {
 
   return (
     <>
-      <Button variant="outline" className={className} onClick={handleClick}>
+      <Button variant="secondary" className={className} onClick={handleClick}>
         Edit document
       </Button>
       <EditKeyDialog document={document} open={dialogOpen} onClose={() => setDialogOpen(false)} />

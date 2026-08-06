@@ -32,9 +32,10 @@ function RouteComponent() {
         />
 
         {/* page view */}
-        <div className="flex h-screen max-w-4xl min-w-0 grow p-5 sm:p-6 lg:p-8">
+        <div className="flex min-h-screen max-w-4xl min-w-0 grow p-5 sm:p-6 lg:p-8">
           <Outlet />
         </div>
+        {/* TODO: it's like this for now. this should be in like a "settings" menu in sidebar or something */}
         <div className="fixed right-4 bottom-6 z-50 xl:static xl:mr-4 xl:mb-6 xl:max-h-fit xl:self-end">
           <EditDocumentButton document={document} className="rounded-none" />
         </div>

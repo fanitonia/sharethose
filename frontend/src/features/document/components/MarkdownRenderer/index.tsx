@@ -9,11 +9,12 @@ import supersub from "remark-supersub";
 
 import { cn } from "@/lib/utils";
 
-import { markdownComponents } from "./components";
+import { customComponents } from "./components";
 
+// TODO: somehow we need to make codeblocks scroolable sidways
 function MarkdownRenderer({ source, className }: { source: string; className?: string }) {
   return (
-    <div className={cn("markdown-content", className)}>
+    <div className={cn("typeset", className)}>
       <Markdown
         remarkPlugins={[
           [remarkGfm, { singleTilde: false }],
@@ -24,7 +25,7 @@ function MarkdownRenderer({ source, className }: { source: string; className?: s
           remarkDefinitionList,
           supersub,
         ]}
-        components={markdownComponents}
+        components={customComponents}
       >
         {source}
       </Markdown>

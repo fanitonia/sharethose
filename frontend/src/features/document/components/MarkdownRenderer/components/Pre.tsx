@@ -8,10 +8,10 @@ type CodeChildProps = {
   className?: string;
 };
 
-function Pre({ children, ...rest }: React.ComponentPropsWithoutRef<"pre">) {
+function Pre({ children }: React.ComponentPropsWithoutRef<"pre">) {
   if (!isValidElement<CodeChildProps>(children)) {
     return (
-      <pre {...rest} className="my-2">
+      <pre>
         {children}
       </pre>
     );
@@ -22,11 +22,10 @@ function Pre({ children, ...rest }: React.ComponentPropsWithoutRef<"pre">) {
 
   return (
     <SyntaxHighlighter
-      {...rest}
       language={match?.[1]}
       style={theme}
       PreTag="pre"
-      customStyle={{ marginTop: 12, marginBottom: 12 }}
+      customStyle={{ padding: "0.75em 1em" }}
     >
       {String(codeChildren).replace(/\n$/, "")}
     </SyntaxHighlighter>
