@@ -1,5 +1,5 @@
 import { CopyLinkInput } from "@/components/actions/CopyLinkInput";
-import { AlertContainer } from "@/components/containers/AlertContainer";
+import { Container } from "@/components/containers/Container";
 import { ProblemDetailsError } from "@/components/feedback/error/ProblemDetailsError";
 import {
   Dialog,
@@ -13,7 +13,7 @@ import type { ShareDialogState } from "@/features/document/hooks/useShareDocumen
 import type { DocumentWithKey } from "@/features/document/types/api";
 import type { ValidationErrorGroup } from "@/features/document/utils/getValidationErrorGroups";
 
-import { ValidationErrorsDialog } from "./ValidationErrorsDialog";
+import { ValidationErrorsDialog } from "../ValidationErrors";
 
 interface ShareDocumentDialogProps {
   state: ShareDialogState;
@@ -52,13 +52,13 @@ function ShareDocumentDialog({
           </DialogHeader>
           <div className="space-y-4">
             <CopyLinkInput value={getDocumentUrl(sharedDocument)} />
-            <AlertContainer>
+            <Container variant="destructive">
               <p>
                 Keep this edit key safe. It is required to edit your document and cannot be
                 recovered.
               </p>
               <CopyLinkInput className="text-foreground" value={sharedDocument.editKey} hideValue />
-            </AlertContainer>
+            </Container>
           </div>
         </DialogContent>
       ) : (

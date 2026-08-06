@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 
 import { customComponents } from "./components";
 
-// TODO: somehow we need to make codeblocks scroolable sidways
+// TODO: somehow we need to make codeblocks scrollable sidways
 function MarkdownRenderer({ source, className }: { source: string; className?: string }) {
   return (
     <div className={cn("typeset", className)}>

@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute, getRouteApi } from "@tanstack/react-router";
 
-import { EditDocumentButton } from "@/features/document/components/DocumentEdit";
+import { EditDocumentButton } from "@/features/document/components/DocumentActions/EditDocument";
 import {
   DocumentSidebar,
   DocumentSidebarMobile,

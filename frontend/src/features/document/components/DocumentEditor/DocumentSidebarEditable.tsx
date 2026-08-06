@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { Ellipsis, Pencil, Plus, Trash2Icon } from "lucide-react";
-import { MenuIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -13,7 +12,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { MAX_PAGE_COUNT } from "@/features/document/constants";
@@ -21,12 +19,12 @@ import { useDocumentEditor } from "@/features/document/context/DocumentEditorCon
 import { useInlineEdit } from "@/features/document/hooks/useInlineEdit";
 import { PAGE_NAME_MAX_LENGTH, TITLE_MAX_LENGTH } from "@/features/document/types/validation";
 
-interface EditorSidebarProps {
+interface DocumentSidebarEditableProps {
   className?: string;
   onPageSelect?: () => void;
 }
 
-function DocumentSidebarEditable({ className, onPageSelect }: EditorSidebarProps) {
+function DocumentSidebarEditable({ className, onPageSelect }: DocumentSidebarEditableProps) {
   return (
     <nav className={className}>
       <div className="flex h-full min-h-0 w-full flex-col gap-6">
@@ -129,7 +127,7 @@ function EditorPageHeader() {
   );
 }
 
-function EditorPageList({ onPageSelect }: Pick<EditorSidebarProps, "onPageSelect">) {
+function EditorPageList({ onPageSelect }: Pick<DocumentSidebarEditableProps, "onPageSelect">) {
   const { pages, selectedPageIndex, selectPage, deletePage, renamePage } = useDocumentEditor();
   const [editingPageIndex, setEditingPageIndex] = useState<number | null>(null);
   const edit = useInlineEdit((name) => {
@@ -220,28 +218,4 @@ function EditorPageList({ onPageSelect }: Pick<EditorSidebarProps, "onPageSelect
   );
 }
 
-function DocumentSidebarEditableMobile({ className }: EditorSidebarProps) {
-  const [open, setOpen] = useState(false);
-  const { title } = useDocumentEditor();
-
-  return (
-    <div className={className}>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger render={<Button variant="ghost" size="icon" aria-label="Open navigation" />}>
-          <MenuIcon className="size-8" />
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0">
-          <SheetTitle className="sr-only">{title}</SheetTitle>
-          <DocumentSidebarEditable
-            onPageSelect={() => {
-              setOpen(false);
-            }}
-            className="h-full w-full bg-card/80 py-5"
-          />
-        </SheetContent>
-      </Sheet>
-    </div>
-  );
-}
-
-export { DocumentSidebarEditable, DocumentSidebarEditableMobile };
+export { DocumentSidebarEditable };

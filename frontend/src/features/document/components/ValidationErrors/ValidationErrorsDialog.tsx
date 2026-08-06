@@ -1,4 +1,4 @@
-import { AlertContainer } from "@/components/containers/AlertContainer";
+import { Container } from "@/components/containers/Container";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ function ValidationErrorsDialog({ validationErrors, onClose }: ValidationErrorsD
           <DialogTitle>Fix validation errors</DialogTitle>
           <DialogDescription>Resolve these issues before sharing.</DialogDescription>
         </DialogHeader>
-        <AlertContainer>
+        <Container variant="destructive">
           <ScrollArea>
             <div className="max-h-96 space-y-3">
               {validationErrors.map((group) => (
@@ -41,7 +41,7 @@ function ValidationErrorsDialog({ validationErrors, onClose }: ValidationErrorsD
               ))}
             </div>
           </ScrollArea>
-        </AlertContainer>
+        </Container>
       </DialogContent>
     </Dialog>
   );

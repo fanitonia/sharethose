@@ -1,3 +1,2 @@
-export * from "./ShareDocumentButton";
-export * from "./ShareDocumentDialog";
-export * from "./ValidationErrorsDialog";
+export { ShareDocumentButton } from "./ShareDocumentButton";
+export { ShareDocumentDialog } from "./ShareDocumentDialog";

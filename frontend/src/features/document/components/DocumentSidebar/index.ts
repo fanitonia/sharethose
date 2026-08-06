@@ -1,2 +1,2 @@
-export * from "./DocumentSidebar";
-export * from "./DocumentSidebarEditable";
+export { DocumentSidebar } from "./DocumentSidebar";
+export { DocumentSidebarMobile } from "./DocumentSidebarMobile";

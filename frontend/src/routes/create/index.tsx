@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   DocumentSidebarEditable,
   DocumentSidebarEditableMobile,
-} from "@/features/document/components/DocumentSidebar";
+} from "@/features/document/components/DocumentEditor";
 import { MarkdownEditor } from "@/features/document/components/MarkdownEditor";
 import { ShareDocumentButton } from "@/features/document/components/ShareDocument";
 import {

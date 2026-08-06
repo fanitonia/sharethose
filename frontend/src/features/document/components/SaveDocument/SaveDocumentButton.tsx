@@ -6,7 +6,7 @@ import { useDocumentEditor } from "@/features/document/context/DocumentEditorCon
 import { useSaveDocument } from "@/features/document/hooks/useSaveDocument";
 import type { Document } from "@/features/document/types/api";
 
-import { ValidationErrorsDialog } from "../ShareDocument/ValidationErrorsDialog";
+import { ValidationErrorsDialog } from "../ValidationErrors";
 
 interface SaveDocumentButtonProps {
   className?: string;

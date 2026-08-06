@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-import { EditKeyDialog } from "@/features/document/components/DocumentEdit/EditKeyDialog";
+import { EditKeyDialog } from "@/features/document/components/DocumentActions/EditDocument/EditKeyDialog";
 import type { Document } from "@/features/document/types/api";
 import { getEditKey } from "@/features/document/utils/editKeyStorage";
 
