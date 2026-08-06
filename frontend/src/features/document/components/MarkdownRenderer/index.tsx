@@ -11,8 +11,6 @@ import { cn } from "@/lib/utils";
 
 import { markdownComponents } from "./components";
 
-// TODO : style containers
-// TODO : maybe we can use shadcn's typeset for styling the markdown content, research
 function MarkdownRenderer({ source, className }: { source: string; className?: string }) {
   return (
     <div className={cn("markdown-content", className)}>

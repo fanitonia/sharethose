@@ -13,7 +13,7 @@ interface MarkdownEditorProps {
   onContentChange: (content: string) => void;
   className?: string;
 }
-// TODO: implement a rich text editor (research, tiptap)
+
 function MarkdownEditor({ content, onContentChange, className }: MarkdownEditorProps) {
   const isExtraLargeScreen = useMediaQuery("(min-width: 80rem)");
 

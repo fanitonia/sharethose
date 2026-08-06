@@ -1,10 +1,10 @@
 import { Outlet, createFileRoute, getRouteApi } from "@tanstack/react-router";
 
+import { EditDocumentButton } from "@/features/document/components/DocumentEdit";
 import {
   DocumentSidebar,
   DocumentSidebarMobile,
 } from "@/features/document/components/DocumentSidebar";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/doc/$documentSlug/page")({
   component: RouteComponent,
@@ -36,9 +36,7 @@ function RouteComponent() {
           <Outlet />
         </div>
         <div className="fixed right-4 bottom-6 z-50 xl:static xl:mr-4 xl:mb-6 xl:max-h-fit xl:self-end">
-          <Button variant="outline" className="rounded-none">
-            Edit document
-          </Button>
+          <EditDocumentButton document={document} className="rounded-none" />
         </div>
       </div>
     </div>

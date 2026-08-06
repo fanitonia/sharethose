@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Settings } from "lucide-react";
 
 import { useState } from "react";
 
+import { Settings } from "lucide-react";
 import { MenuIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";

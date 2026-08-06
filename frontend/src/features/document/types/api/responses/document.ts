@@ -1,7 +1,7 @@
 import type { Page } from "./page";
 
 interface Document {
-  id: number;
+  id: string;
   createdAt: string;
   updatedAt: string;
   slug: string;

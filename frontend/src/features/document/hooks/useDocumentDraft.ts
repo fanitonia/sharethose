@@ -4,7 +4,12 @@ import { MAX_PAGE_COUNT } from "@/features/document/constants";
 import type { DocumentDraft, DraftPage } from "@/features/document/types/draft";
 import { validateDraft } from "@/features/document/types/validation";
 
-const draftStorageKey = "draft-document";
+const defaultDraftStorageKey = "draft-document";
+
+interface UseDocumentDraftOptions {
+  storageKey?: string;
+  initialDraft?: DocumentDraft;
+}
 
 type DraftAction =
   | { type: "SET_TITLE"; title: string }
@@ -12,7 +17,8 @@ type DraftAction =
   | { type: "UPDATE_PAGE_CONTENT"; index: number; content: string }
   | { type: "ADD_PAGE" }
   | { type: "DELETE_PAGE"; index: number }
-  | { type: "SELECT_PAGE"; index: number };
+  | { type: "SELECT_PAGE"; index: number }
+  | { type: "RESET"; draft: DocumentDraft };
 
 function createPage(): DraftPage {
   return {
@@ -41,18 +47,20 @@ function isStoredPage(value: unknown): value is Omit<DraftPage, "id"> & {
   return typeof page.name === "string" && typeof page.content === "string";
 }
 
-function loadDraft(): DocumentDraft {
+function loadDraft(options?: UseDocumentDraftOptions): DocumentDraft {
+  const fallback = () => options?.initialDraft ?? createEmptyDraft();
+
   try {
-    const rawDraft = localStorage.getItem(draftStorageKey);
+    const rawDraft = localStorage.getItem(options?.storageKey ?? defaultDraftStorageKey);
 
     if (!rawDraft) {
-      return createEmptyDraft();
+      return fallback();
     }
 
     const value: unknown = JSON.parse(rawDraft);
 
     if (typeof value !== "object" || value === null) {
-      return createEmptyDraft();
+      return fallback();
     }
 
     const draft = value as Record<string, unknown>;
@@ -63,7 +71,7 @@ function loadDraft(): DocumentDraft {
       draft.pages.length === 0 ||
       !draft.pages.every(isStoredPage)
     ) {
-      return createEmptyDraft();
+      return fallback();
     }
 
     return {
@@ -81,7 +89,7 @@ function loadDraft(): DocumentDraft {
           : 0,
     };
   } catch {
-    return createEmptyDraft();
+    return fallback();
   }
 }
 
@@ -128,11 +136,15 @@ function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
       };
     case "SELECT_PAGE":
       return state.pages[action.index] ? { ...state, selectedPageIndex: action.index } : state;
+    case "RESET":
+      return action.draft;
   }
 }
 
-function useDocumentDraft() {
-  const [draft, dispatch] = useReducer(reducer, undefined, loadDraft);
+function useDocumentDraft(options?: UseDocumentDraftOptions) {
+  const storageKey = options?.storageKey ?? defaultDraftStorageKey;
+  const initialDraft = options?.initialDraft;
+  const [draft, dispatch] = useReducer(reducer, { storageKey, initialDraft }, loadDraft);
   const persistenceVersion = useRef(0);
   const validationErrors = useMemo(() => validateDraft(draft).errors, [draft]);
 
@@ -140,16 +152,17 @@ function useDocumentDraft() {
     const version = persistenceVersion.current;
     const timeoutId = window.setTimeout(() => {
       if (version === persistenceVersion.current) {
-        localStorage.setItem(draftStorageKey, JSON.stringify(draft));
+        localStorage.setItem(storageKey, JSON.stringify(draft));
       }
     }, 400);
 
     return () => window.clearTimeout(timeoutId);
-  }, [draft]);
+  }, [draft, storageKey]);
 
   function clearDraft() {
     persistenceVersion.current += 1;
-    localStorage.removeItem(draftStorageKey);
+    localStorage.removeItem(storageKey);
+    dispatch({ type: "RESET", draft: initialDraft ?? createEmptyDraft() });
   }
 
   function validate() {

@@ -5,5 +5,5 @@ function Code({ children, ...rest }: { children: React.ReactNode; className?: st
     </code>
   );
 }
-// TODO: thema'ya göre renkleri ayarla.
+
 export { Code };

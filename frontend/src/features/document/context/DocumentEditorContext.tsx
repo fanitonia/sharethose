@@ -22,8 +22,18 @@ interface DocumentEditorContextValue {
 
 const DocumentEditorContext = createContext<DocumentEditorContextValue | null>(null);
 
-function DocumentEditorProvider({ children }: { children: React.ReactNode }) {
-  const { draft, ...actions } = useDocumentDraft();
+interface DocumentEditorProviderProps {
+  children: React.ReactNode;
+  storageKey?: string;
+  initialDraft?: DocumentDraft;
+}
+
+function DocumentEditorProvider({
+  children,
+  storageKey,
+  initialDraft,
+}: DocumentEditorProviderProps) {
+  const { draft, ...actions } = useDocumentDraft({ storageKey, initialDraft });
 
   return (
     <DocumentEditorContext.Provider value={{ draft, ...draft, ...actions }}>

@@ -25,7 +25,7 @@ interface EditorSidebarProps {
   className?: string;
   onPageSelect?: () => void;
 }
-// TODO: we should be able to reorder pages with drag and drop
+
 function DocumentSidebarEditable({ className, onPageSelect }: EditorSidebarProps) {
   return (
     <nav className={className}>
@@ -41,7 +41,7 @@ function DocumentSidebarEditable({ className, onPageSelect }: EditorSidebarProps
 function EditorTitleHeader() {
   const { title, setTitle } = useDocumentEditor();
   const edit = useInlineEdit(setTitle);
-
+  // FIXME: buggy, when we click it sometimes not working
   return (
     <div className="group relative border-b border-border pb-4">
       {edit.editing ? (
