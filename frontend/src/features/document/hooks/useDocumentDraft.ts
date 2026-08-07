@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useReducer, useRef } from "react";
 
-import { MAX_PAGE_COUNT } from "@/features/document/constants";
+import { DRAFT_EXPIRATION_MS, MAX_PAGE_COUNT } from "@/features/document/constants";
 import type { DocumentDraft, DraftPage } from "@/features/document/types/draft";
+import type { DraftStorage } from "@/features/document/types/draftStorage";
 import { validateDraft } from "@/features/document/types/validation";
 
-const defaultDraftStorageKey = "draft-document";
+const draftStorageKey = "document-drafts";
 
 interface UseDocumentDraftOptions {
-  storageKey?: string;
   initialDraft?: DocumentDraft;
+  documentId?: string;
 }
 
 type DraftAction =
@@ -47,50 +48,90 @@ function isStoredPage(value: unknown): value is Omit<DraftPage, "id"> & {
   return typeof page.name === "string" && typeof page.content === "string";
 }
 
+function isDraftStorage(value: unknown): value is DraftStorage {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const storage = value as Record<string, unknown>;
+  return Array.isArray(storage.edited);
+}
+
+function isExpired(createdAt: string): boolean {
+  const createdAtTime = new Date(createdAt).getTime();
+  return Number.isNaN(createdAtTime) || Date.now() - createdAtTime > DRAFT_EXPIRATION_MS;
+}
+
+function isStoredDraft(value: unknown): value is { draft: DocumentDraft; createdAt: string } {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+
+  const storedDraft = value as Record<string, unknown>;
+  const draft = storedDraft.draft as Record<string, unknown>;
+  return (
+    typeof storedDraft.createdAt === "string" &&
+    typeof draft === "object" &&
+    draft !== null &&
+    typeof draft.title === "string" &&
+    Array.isArray(draft.pages) &&
+    draft.pages.length > 0 &&
+    draft.pages.every(isStoredPage) &&
+    typeof draft.selectedPageIndex === "number" &&
+    draft.selectedPageIndex >= 0 &&
+    draft.selectedPageIndex < draft.pages.length
+  );
+}
+
+function readDraftStorage(): DraftStorage {
+  try {
+    const rawStorage = localStorage.getItem(draftStorageKey);
+
+    if (!rawStorage) {
+      return { edited: [] };
+    }
+
+    const value: unknown = JSON.parse(rawStorage);
+    if (!isDraftStorage(value)) {
+      localStorage.removeItem(draftStorageKey);
+      return { edited: [] };
+    }
+
+    const created =
+      isStoredDraft(value.created) && !isExpired(value.created.createdAt)
+        ? value.created
+        : undefined;
+    const edited = value.edited.filter(
+      (entry): entry is DraftStorage["edited"][number] =>
+        typeof entry === "object" &&
+        entry !== null &&
+        typeof (entry as Record<string, unknown>).documentId === "string" &&
+        isStoredDraft(entry) &&
+        !isExpired(entry.createdAt)
+    );
+    const storage = { created, edited };
+
+    if (created || edited.length > 0) {
+      localStorage.setItem(draftStorageKey, JSON.stringify(storage));
+    } else {
+      localStorage.removeItem(draftStorageKey);
+    }
+
+    return storage;
+  } catch {
+    localStorage.removeItem(draftStorageKey);
+    return { edited: [] };
+  }
+}
+
 function loadDraft(options?: UseDocumentDraftOptions): DocumentDraft {
   const fallback = () => options?.initialDraft ?? createEmptyDraft();
+  const storage = readDraftStorage();
+  const storedDraft = options?.documentId
+    ? storage.edited.find((entry) => entry.documentId === options.documentId)
+    : storage.created;
 
-  try {
-    const rawDraft = localStorage.getItem(options?.storageKey ?? defaultDraftStorageKey);
-
-    if (!rawDraft) {
-      return fallback();
-    }
-
-    const value: unknown = JSON.parse(rawDraft);
-
-    if (typeof value !== "object" || value === null) {
-      return fallback();
-    }
-
-    const draft = value as Record<string, unknown>;
-
-    if (
-      typeof draft.title !== "string" ||
-      !Array.isArray(draft.pages) ||
-      draft.pages.length === 0 ||
-      !draft.pages.every(isStoredPage)
-    ) {
-      return fallback();
-    }
-
-    return {
-      title: draft.title,
-      pages: draft.pages.map((page) => ({
-        id: typeof page.id === "string" ? page.id : crypto.randomUUID(),
-        name: page.name,
-        content: page.content,
-      })),
-      selectedPageIndex:
-        typeof draft.selectedPageIndex === "number" &&
-        draft.selectedPageIndex >= 0 &&
-        draft.selectedPageIndex < draft.pages.length
-          ? draft.selectedPageIndex
-          : 0,
-    };
-  } catch {
-    return fallback();
-  }
+  return storedDraft?.draft ?? fallback();
 }
 
 function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
@@ -142,26 +183,59 @@ function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
 }
 
 function useDocumentDraft(options?: UseDocumentDraftOptions) {
-  const storageKey = options?.storageKey ?? defaultDraftStorageKey;
   const initialDraft = options?.initialDraft;
-  const [draft, dispatch] = useReducer(reducer, { storageKey, initialDraft }, loadDraft);
+  const documentId = options?.documentId;
+  const [draft, dispatch] = useReducer(reducer, { documentId, initialDraft }, loadDraft);
   const persistenceVersion = useRef(0);
+  const skipNextPersistence = useRef(false);
   const validationErrors = useMemo(() => validateDraft(draft).errors, [draft]);
 
   useEffect(() => {
+    if (skipNextPersistence.current) {
+      skipNextPersistence.current = false;
+      return;
+    }
+
     const version = persistenceVersion.current;
     const timeoutId = window.setTimeout(() => {
       if (version === persistenceVersion.current) {
-        localStorage.setItem(storageKey, JSON.stringify(draft));
+        const storage = readDraftStorage();
+        const createdAt = new Date().toISOString();
+
+        if (documentId) {
+          const existingDraft = storage.edited.find((entry) => entry.documentId === documentId);
+          storage.edited = [
+            ...storage.edited.filter((entry) => entry.documentId !== documentId),
+            { documentId, draft, createdAt: existingDraft?.createdAt ?? createdAt },
+          ];
+        } else {
+          storage.created = { draft, createdAt: storage.created?.createdAt ?? createdAt };
+        }
+
+        localStorage.setItem(draftStorageKey, JSON.stringify(storage));
       }
     }, 400);
 
     return () => window.clearTimeout(timeoutId);
-  }, [draft, storageKey]);
+  }, [documentId, draft]);
 
   function clearDraft() {
     persistenceVersion.current += 1;
-    localStorage.removeItem(storageKey);
+    skipNextPersistence.current = true;
+    const storage = readDraftStorage();
+
+    if (documentId) {
+      storage.edited = storage.edited.filter((entry) => entry.documentId !== documentId);
+    } else {
+      delete storage.created;
+    }
+
+    if (storage.created || storage.edited.length > 0) {
+      localStorage.setItem(draftStorageKey, JSON.stringify(storage));
+    } else {
+      localStorage.removeItem(draftStorageKey);
+    }
+
     dispatch({ type: "RESET", draft: initialDraft ?? createEmptyDraft() });
   }
 

@@ -10,11 +10,7 @@ type CodeChildProps = {
 
 function Pre({ children }: React.ComponentPropsWithoutRef<"pre">) {
   if (!isValidElement<CodeChildProps>(children)) {
-    return (
-      <pre>
-        {children}
-      </pre>
-    );
+    return <pre>{children}</pre>;
   }
 
   const { children: codeChildren, className } = children.props;

@@ -35,7 +35,7 @@ function RouteComponent() {
 
   return (
     <DocumentEditorProvider
-      storageKey={`draft-document-edit-${document.slug}`}
+      documentId={document.id}
       initialDraft={convertDocumentToDraft(document)}
     >
       <EditDocumentEditor document={document} editKey={editKey} />

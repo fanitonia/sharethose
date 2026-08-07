@@ -24,16 +24,16 @@ const DocumentEditorContext = createContext<DocumentEditorContextValue | null>(n
 
 interface DocumentEditorProviderProps {
   children: React.ReactNode;
-  storageKey?: string;
   initialDraft?: DocumentDraft;
+  documentId?: string;
 }
 
 function DocumentEditorProvider({
   children,
-  storageKey,
   initialDraft,
+  documentId,
 }: DocumentEditorProviderProps) {
-  const { draft, ...actions } = useDocumentDraft({ storageKey, initialDraft });
+  const { draft, ...actions } = useDocumentDraft({ documentId, initialDraft });
 
   return (
     <DocumentEditorContext.Provider value={{ draft, ...draft, ...actions }}>
