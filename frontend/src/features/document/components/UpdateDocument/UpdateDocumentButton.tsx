@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 import { useDocumentEditor } from "@/features/document/context/DocumentEditorContext";
-import { useSaveDocument } from "@/features/document/hooks/useSaveDocument";
+import { useUpdateDocument } from "@/features/document/hooks/useUpdateDocument";
 import type { Document } from "@/features/document/types/api";
 
 import { ValidationErrorsDialog } from "../ValidationErrors";
@@ -14,9 +14,9 @@ interface SaveDocumentButtonProps {
   editKey: string;
 }
 
-function SaveDocumentButton({ className, document, editKey }: SaveDocumentButtonProps) {
+function UpdateDocumentButton({ className, document, editKey }: SaveDocumentButtonProps) {
   const { draft, clearDraft } = useDocumentEditor();
-  const { save, dialogState, error, validationErrors, isPending, reset } = useSaveDocument(
+  const { save, dialogState, error, validationErrors, isPending, reset } = useUpdateDocument(
     draft,
     document,
     { editKey, onSuccess: clearDraft }
@@ -24,8 +24,8 @@ function SaveDocumentButton({ className, document, editKey }: SaveDocumentButton
 
   return (
     <>
-      <Button className={className} disabled={isPending} onClick={save}>
-        {isPending ? "Saving..." : "Save"}
+      <Button variant="outline" className={className} disabled={isPending} onClick={save}>
+        {isPending ? "Updating..." : "Update"}
       </Button>
       {dialogState === "validation" && (
         <ValidationErrorsDialog validationErrors={validationErrors} onClose={reset} />
@@ -34,7 +34,7 @@ function SaveDocumentButton({ className, document, editKey }: SaveDocumentButton
         <Dialog open onOpenChange={(open) => !open && reset()}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Failed to save document</DialogTitle>
+              <DialogTitle>Failed to update document</DialogTitle>
             </DialogHeader>
             <ProblemDetailsError error={error} fallbackMessage="Please try again." />
           </DialogContent>
@@ -44,4 +44,4 @@ function SaveDocumentButton({ className, document, editKey }: SaveDocumentButton
   );
 }
 
-export { SaveDocumentButton };
+export { UpdateDocumentButton };

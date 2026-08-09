@@ -1,16 +1,12 @@
-import { Navigate, createFileRoute, getRouteApi, useNavigate } from "@tanstack/react-router";
-
-import { Button } from "@/components/ui/button";
+import { Navigate, createFileRoute, getRouteApi } from "@tanstack/react-router";
 
 import {
   DocumentSidebarEditable,
   DocumentSidebarEditableMobile,
 } from "@/features/document/components/DocumentEditor";
+import { DocumentEditorActions } from "@/features/document/components/DocumentEditor/EditorActions/DocumentEditorActions";
 import { MarkdownEditor } from "@/features/document/components/MarkdownEditor";
-import {
-  DocumentSettingsDialog,
-  SaveDocumentButton,
-} from "@/features/document/components/SaveDocument";
+import { DocumentSettingsDialog } from "@/features/document/components/UpdateDocument";
 import {
   DocumentEditorProvider,
   useDocumentEditor,
@@ -51,7 +47,6 @@ interface EditDocumentEditorProps {
 function EditDocumentEditor({ document, editKey }: EditDocumentEditorProps) {
   const { draft, updatePageContent } = useDocumentEditor();
   const selectedPage = draft.pages[draft.selectedPageIndex];
-  const navigate = useNavigate();
 
   return (
     <div className="h-screen bg-background">
@@ -64,21 +59,11 @@ function EditDocumentEditor({ document, editKey }: EditDocumentEditorProps) {
         <div className="flex h-full flex-1 flex-col">
           <div className="flex items-center gap-2 border bg-card px-4 py-4">
             <DocumentSettingsDialog document={document} editKey={editKey} />
-            <div className="ml-auto flex gap-2">
-              {/* TODO: make this a component */}
-              <Button
-                variant="secondary"
-                onClick={() =>
-                  navigate({
-                    to: "/doc/$documentSlug",
-                    params: { documentSlug: document.slug },
-                  })
-                }
-              >
-                Cancel
-              </Button>
-              <SaveDocumentButton document={document} editKey={editKey} />
-            </div>
+            <DocumentEditorActions
+              document={document}
+              editKey={editKey}
+              className="ml-auto flex gap-2"
+            />
           </div>
           <MarkdownEditor
             className="min-h-0 flex-1"

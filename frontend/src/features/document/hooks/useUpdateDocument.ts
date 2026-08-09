@@ -11,15 +11,15 @@ import { getValidationErrorGroups } from "@/features/document/utils/getValidatio
 
 type SaveDialogState = "idle" | "validation" | "error";
 
-interface UseSaveDocumentOptions {
+interface UseUpdateDocumentOptions {
   editKey: string;
   onSuccess?: () => void;
 }
 
-function useSaveDocument(
+function useUpdateDocument(
   draft: DocumentDraft,
   document: Document,
-  options: UseSaveDocumentOptions
+  options: UseUpdateDocumentOptions
 ) {
   const navigate = useNavigate();
   const router = useRouter();
@@ -78,5 +78,5 @@ function useSaveDocument(
   };
 }
 
-export { useSaveDocument };
+export { useUpdateDocument };
 export type { SaveDialogState };
