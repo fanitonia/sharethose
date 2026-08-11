@@ -107,17 +107,19 @@ function EditorPageHeader() {
       </div>
       <div className="flex items-center gap-2">
         <Tooltip>
-          <TooltipTrigger>
-            <Button
-              variant="ghost"
-              size="icon-lg"
-              aria-label="Add page"
-              onClick={addPage}
-              disabled={pages.length >= MAX_PAGE_COUNT}
-            >
-              <Plus />
-            </Button>
-          </TooltipTrigger>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon-lg"
+                aria-label="Add page"
+                onClick={addPage}
+                disabled={pages.length >= MAX_PAGE_COUNT}
+              >
+                <Plus />
+              </Button>
+            }
+          />
           <TooltipContent>
             <p>{pages.length >= MAX_PAGE_COUNT ? "Page limit reached" : "Add page"}</p>
           </TooltipContent>
