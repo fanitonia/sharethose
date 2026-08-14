@@ -45,8 +45,8 @@ interface EditDocumentEditorProps {
 }
 
 function EditDocumentEditor({ document, editKey }: EditDocumentEditorProps) {
-  const { draft, updatePageContent } = useDocumentEditor();
-  const selectedPage = draft.pages[draft.selectedPageIndex];
+  const { draft, selectedPageIndex, updatePageContent } = useDocumentEditor();
+  const selectedPage = draft.pages[selectedPageIndex];
 
   return (
     <div className="h-screen bg-background">
@@ -68,7 +68,7 @@ function EditDocumentEditor({ document, editKey }: EditDocumentEditorProps) {
           <MarkdownEditor
             className="min-h-0 flex-1"
             content={selectedPage.content}
-            onContentChange={(content) => updatePageContent(draft.selectedPageIndex, content)}
+            onContentChange={(content) => updatePageContent(selectedPageIndex, content)}
           />
         </div>
       </div>

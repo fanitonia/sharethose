@@ -37,7 +37,7 @@ function DocumentSidebarEditable({ className, onPageSelect }: DocumentSidebarEdi
 }
 
 function EditorTitleHeader() {
-  const { title, setTitle } = useDocumentEditor();
+  const { draft, setTitle } = useDocumentEditor();
   const edit = useInlineEdit(setTitle);
   // FIXME: buggy, when we click it sometimes not working
   return (
@@ -66,10 +66,10 @@ function EditorTitleHeader() {
             <h1
               className={cn(
                 "px-6 text-center text-2xl font-semibold wrap-break-word text-foreground",
-                !title && "text-destructive"
+                !draft.title && "text-destructive"
               )}
             >
-              {title || "Please enter a title"}
+              {draft.title || "Please enter a title"}
             </h1>
             <Tooltip>
               <TooltipTrigger
@@ -79,7 +79,7 @@ function EditorTitleHeader() {
                     size="icon-sm"
                     className="absolute top-1/2 right-[4%] -translate-y-1/2 lg:opacity-0 lg:transition-opacity lg:group-focus-within:opacity-100 lg:group-hover:opacity-100"
                     aria-label="Rename document"
-                    onClick={() => edit.start(title)}
+                    onClick={() => edit.start(draft.title)}
                   />
                 }
               >
@@ -95,14 +95,14 @@ function EditorTitleHeader() {
 }
 
 function EditorPageHeader() {
-  const { pages, addPage } = useDocumentEditor();
+  const { draft, addPage } = useDocumentEditor();
 
   return (
     <div className="flex items-center justify-between border-y border-border px-6 py-1">
       <div className="flex h-full items-center gap-3">
         <p className="font-semibold">Pages</p>
         <p className="text-sm text-muted-foreground">
-          {pages.length} / {MAX_PAGE_COUNT}
+          {draft.pages.length} / {MAX_PAGE_COUNT}
         </p>
       </div>
       <div className="flex items-center gap-2">
@@ -114,14 +114,14 @@ function EditorPageHeader() {
                 size="icon-lg"
                 aria-label="Add page"
                 onClick={addPage}
-                disabled={pages.length >= MAX_PAGE_COUNT}
+                disabled={draft.pages.length >= MAX_PAGE_COUNT}
               >
                 <Plus />
               </Button>
             }
           />
           <TooltipContent>
-            <p>{pages.length >= MAX_PAGE_COUNT ? "Page limit reached" : "Add page"}</p>
+            <p>{draft.pages.length >= MAX_PAGE_COUNT ? "Page limit reached" : "Add page"}</p>
           </TooltipContent>
         </Tooltip>
       </div>
@@ -130,7 +130,7 @@ function EditorPageHeader() {
 }
 
 function EditorPageList({ onPageSelect }: Pick<DocumentSidebarEditableProps, "onPageSelect">) {
-  const { pages, selectedPageIndex, selectPage, deletePage, renamePage } = useDocumentEditor();
+  const { draft, selectedPageIndex, selectPage, deletePage, renamePage } = useDocumentEditor();
   const [editingPageIndex, setEditingPageIndex] = useState<number | null>(null);
   const edit = useInlineEdit((name) => {
     if (editingPageIndex !== null) {
@@ -141,13 +141,13 @@ function EditorPageList({ onPageSelect }: Pick<DocumentSidebarEditableProps, "on
 
   function startRenaming(index: number) {
     setEditingPageIndex(index);
-    edit.start(pages[index].name || "");
+    edit.start(draft.pages[index].name || "");
   }
 
   return (
     <ScrollArea className="min-h-0 flex-1">
       <ul className="flex w-full flex-col">
-        {pages.map((page, index) => (
+        {draft.pages.map((page, index) => (
           <li
             key={page.id}
             className={cn(

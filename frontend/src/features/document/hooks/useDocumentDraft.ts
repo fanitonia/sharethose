@@ -5,7 +5,7 @@ import type { DocumentDraft, DraftPage } from "@/features/document/types/draft";
 import type { DraftStorage } from "@/features/document/types/draftStorage";
 import { validateDraft } from "@/features/document/types/validation";
 
-const draftStorageKey = "document-drafts";
+const draftStorageKey = "document-drafts-v2";
 
 interface UseDocumentDraftOptions {
   initialDraft?: DocumentDraft;
@@ -18,7 +18,6 @@ type DraftAction =
   | { type: "UPDATE_PAGE_CONTENT"; index: number; content: string }
   | { type: "ADD_PAGE" }
   | { type: "DELETE_PAGE"; index: number }
-  | { type: "SELECT_PAGE"; index: number }
   | { type: "RESET"; draft: DocumentDraft };
 
 function createPage(): DraftPage {
@@ -33,7 +32,6 @@ function createEmptyDraft(): DocumentDraft {
   return {
     title: "Untitled Document",
     pages: [createPage()],
-    selectedPageIndex: 0,
   };
 }
 
@@ -76,10 +74,7 @@ function isStoredDraft(value: unknown): value is { draft: DocumentDraft; created
     typeof draft.title === "string" &&
     Array.isArray(draft.pages) &&
     draft.pages.length > 0 &&
-    draft.pages.every(isStoredPage) &&
-    typeof draft.selectedPageIndex === "number" &&
-    draft.selectedPageIndex >= 0 &&
-    draft.selectedPageIndex < draft.pages.length
+    draft.pages.every(isStoredPage)
   );
 }
 
@@ -160,7 +155,6 @@ function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
       return {
         ...state,
         pages: [...state.pages, createPage()],
-        selectedPageIndex: state.pages.length,
       };
     case "DELETE_PAGE":
       if (state.pages.length === 1 || !state.pages[action.index]) {
@@ -170,13 +164,7 @@ function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
       return {
         ...state,
         pages: state.pages.filter((_, index) => index !== action.index),
-        selectedPageIndex:
-          action.index < state.selectedPageIndex
-            ? state.selectedPageIndex - 1
-            : Math.min(state.selectedPageIndex, state.pages.length - 2),
       };
-    case "SELECT_PAGE":
-      return state.pages[action.index] ? { ...state, selectedPageIndex: action.index } : state;
     case "RESET":
       return action.draft;
   }
@@ -254,7 +242,6 @@ function useDocumentDraft(options?: UseDocumentDraftOptions) {
       dispatch({ type: "UPDATE_PAGE_CONTENT", index, content }),
     addPage: () => dispatch({ type: "ADD_PAGE" }),
     deletePage: (index: number) => dispatch({ type: "DELETE_PAGE", index }),
-    selectPage: (index: number) => dispatch({ type: "SELECT_PAGE", index }),
   };
 }
 

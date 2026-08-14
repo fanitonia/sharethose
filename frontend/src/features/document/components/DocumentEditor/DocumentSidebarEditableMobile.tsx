@@ -15,7 +15,7 @@ interface DocumentSidebarEditableMobileProps {
 
 function DocumentSidebarEditableMobile({ className }: DocumentSidebarEditableMobileProps) {
   const [open, setOpen] = useState(false);
-  const { title } = useDocumentEditor();
+  const { draft } = useDocumentEditor();
 
   return (
     <div className={className}>
@@ -24,7 +24,7 @@ function DocumentSidebarEditableMobile({ className }: DocumentSidebarEditableMob
           <MenuIcon className="size-8" />
         </SheetTrigger>
         <SheetContent side="left" className="p-0">
-          <SheetTitle className="sr-only">{title}</SheetTitle>
+          <SheetTitle className="sr-only">{draft.title}</SheetTitle>
           <DocumentSidebarEditable
             onPageSelect={() => setOpen(false)}
             className="h-full w-full bg-card/80 py-5"

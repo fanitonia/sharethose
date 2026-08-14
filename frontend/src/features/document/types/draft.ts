@@ -9,7 +9,6 @@ interface DraftPage {
 interface DocumentDraft {
   title: string;
   pages: DraftPage[];
-  selectedPageIndex: number;
 }
 
 function convertToCreateDocumentRequest(draft: DocumentDraft): CreateDocumentRequest {
@@ -27,7 +26,6 @@ function convertDocumentToDraft(document: Document): DocumentDraft {
       name: page.name,
       content: page.content,
     })),
-    selectedPageIndex: 0,
   };
 }
 

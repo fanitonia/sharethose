@@ -25,7 +25,7 @@ interface ContainerProps {
 function Container({ children, className, variant }: ContainerProps) {
   return (
     <Item className={cn(containerVariants({ variant }), className)}>
-      <ItemContent className="space-y-2">{children}</ItemContent>
+      <ItemContent>{children}</ItemContent>
     </Item>
   );
 }
