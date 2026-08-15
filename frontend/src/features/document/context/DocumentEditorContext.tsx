@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 
+import { DraftRecoveryDialog } from "@/features/document/components/DocumentEditor/DraftRecoveryDialog";
 import { MAX_PAGE_COUNT } from "@/features/document/constants";
 import { useDocumentDraft } from "@/features/document/hooks/useDocumentDraft";
 import type { DocumentDraft } from "@/features/document/types/draft";
@@ -11,6 +12,9 @@ interface DocumentEditorContextValue {
   validationErrors: DraftValidationErrors;
   validate: () => boolean;
   clearDraft: () => void;
+  hasPendingDraft: boolean;
+  restoreDraft: () => void;
+  discardDraft: () => void;
   setTitle: (title: string) => void;
   renamePage: (index: number, name: string) => void;
   updatePageContent: (index: number, content: string) => void;
@@ -67,19 +71,26 @@ function DocumentEditorProvider({
   }
 
   return (
-    <DocumentEditorContext.Provider
-      value={{
-        draft,
-        ...actions,
-        clearDraft,
-        addPage,
-        deletePage,
-        selectedPageIndex,
-        selectPage,
-      }}
-    >
-      {children}
-    </DocumentEditorContext.Provider>
+    <>
+      <DocumentEditorContext.Provider
+        value={{
+          draft,
+          ...actions,
+          clearDraft,
+          addPage,
+          deletePage,
+          selectedPageIndex,
+          selectPage,
+        }}
+      >
+        {children}
+      </DocumentEditorContext.Provider>
+      <DraftRecoveryDialog
+        open={actions.hasPendingDraft}
+        onDiscard={actions.discardDraft}
+        onRestore={actions.restoreDraft}
+      />
+    </>
   );
 }
 

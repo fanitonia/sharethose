@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState } from "react";
 
 import { DRAFT_EXPIRATION_MS, MAX_PAGE_COUNT } from "@/features/document/constants";
 import type { DocumentDraft, DraftPage } from "@/features/document/types/draft";
@@ -78,6 +78,17 @@ function isStoredDraft(value: unknown): value is { draft: DocumentDraft; created
   );
 }
 
+function draftsAreEqual(left: DocumentDraft, right: DocumentDraft): boolean {
+  return (
+    left.title === right.title &&
+    left.pages.length === right.pages.length &&
+    left.pages.every(
+      (page, index) =>
+        page.name === right.pages[index]?.name && page.content === right.pages[index]?.content
+    )
+  );
+}
+
 function readDraftStorage(): DraftStorage {
   try {
     const rawStorage = localStorage.getItem(draftStorageKey);
@@ -119,14 +130,13 @@ function readDraftStorage(): DraftStorage {
   }
 }
 
-function loadDraft(options?: UseDocumentDraftOptions): DocumentDraft {
-  const fallback = () => options?.initialDraft ?? createEmptyDraft();
+function findStoredDraft(options?: UseDocumentDraftOptions): DocumentDraft | undefined {
   const storage = readDraftStorage();
   const storedDraft = options?.documentId
     ? storage.edited.find((entry) => entry.documentId === options.documentId)
     : storage.created;
 
-  return storedDraft?.draft ?? fallback();
+  return storedDraft?.draft;
 }
 
 function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
@@ -173,12 +183,27 @@ function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
 function useDocumentDraft(options?: UseDocumentDraftOptions) {
   const initialDraft = options?.initialDraft;
   const documentId = options?.documentId;
-  const [draft, dispatch] = useReducer(reducer, { documentId, initialDraft }, loadDraft);
+  const [initialState] = useState(() => {
+    const fallbackDraft = initialDraft ?? createEmptyDraft();
+    const storedDraft = findStoredDraft(options);
+
+    return {
+      fallbackDraft,
+      pendingDraft:
+        storedDraft && !draftsAreEqual(storedDraft, fallbackDraft) ? storedDraft : undefined,
+    };
+  });
+  const [draft, dispatch] = useReducer(reducer, initialState.fallbackDraft);
+  const [pendingDraft, setPendingDraft] = useState(initialState.pendingDraft);
   const persistenceVersion = useRef(0);
   const skipNextPersistence = useRef(false);
   const validationErrors = useMemo(() => validateDraft(draft).errors, [draft]);
 
   useEffect(() => {
+    if (pendingDraft) {
+      return;
+    }
+
     if (skipNextPersistence.current) {
       skipNextPersistence.current = false;
       return;
@@ -205,11 +230,9 @@ function useDocumentDraft(options?: UseDocumentDraftOptions) {
     }, 400);
 
     return () => window.clearTimeout(timeoutId);
-  }, [documentId, draft]);
+  }, [documentId, draft, pendingDraft]);
 
-  function clearDraft() {
-    persistenceVersion.current += 1;
-    skipNextPersistence.current = true;
+  function removeStoredDraft() {
     const storage = readDraftStorage();
 
     if (documentId) {
@@ -223,8 +246,35 @@ function useDocumentDraft(options?: UseDocumentDraftOptions) {
     } else {
       localStorage.removeItem(draftStorageKey);
     }
+  }
 
-    dispatch({ type: "RESET", draft: initialDraft ?? createEmptyDraft() });
+  function restoreDraft() {
+    if (!pendingDraft) {
+      return;
+    }
+
+    dispatch({ type: "RESET", draft: pendingDraft });
+    setPendingDraft(undefined);
+  }
+
+  function discardDraft() {
+    if (!pendingDraft) {
+      return;
+    }
+
+    persistenceVersion.current += 1;
+    skipNextPersistence.current = true;
+    removeStoredDraft();
+    dispatch({ type: "RESET", draft: initialState.fallbackDraft });
+    setPendingDraft(undefined);
+  }
+
+  function clearDraft() {
+    persistenceVersion.current += 1;
+    skipNextPersistence.current = true;
+    removeStoredDraft();
+
+    dispatch({ type: "RESET", draft: initialState.fallbackDraft });
   }
 
   function validate() {
@@ -236,6 +286,9 @@ function useDocumentDraft(options?: UseDocumentDraftOptions) {
     validationErrors,
     validate,
     clearDraft,
+    hasPendingDraft: Boolean(pendingDraft),
+    restoreDraft,
+    discardDraft,
     setTitle: (title: string) => dispatch({ type: "SET_TITLE", title }),
     renamePage: (index: number, name: string) => dispatch({ type: "RENAME_PAGE", index, name }),
     updatePageContent: (index: number, content: string) =>
