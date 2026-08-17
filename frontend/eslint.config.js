@@ -25,8 +25,20 @@ export default defineConfig([
       "eslint-plugin-query": eslintPluginQuery,
     },
     rules: {
-      "react-refresh/only-export-components": ["warn"],
+      "react-refresh/only-export-components": [
+        "warn",
+        {
+          allowConstantExport: true,
+          allowExportNames: ["Route"],
+        },
+      ],
       "@typescript-eslint/no-unused-vars": "warn",
+    },
+  },
+  {
+    files: ["src/routes/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
     },
   },
 ]);

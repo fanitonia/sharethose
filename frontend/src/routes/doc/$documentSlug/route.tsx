@@ -1,6 +1,6 @@
 import { Outlet, createFileRoute } from "@tanstack/react-router";
 
-import { ProblemDetailsError } from "@/components/feedback/error/ProblemDetailsError";
+import { ProblemDetails } from "@/components/feedback/error/problem-details";
 
 import { documentQueryOptions } from "@/features/document/api";
 
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/doc/$documentSlug")({
   // TODO: create a better loading state (skeleton or spinner?)
   pendingComponent: () => <div className="m-4">Loading document...</div>,
   errorComponent: ({ error }) => (
-    <ProblemDetailsError error={error} fallbackMessage="Failed to load document." />
+    <ProblemDetails error={error} fallbackMessage="Failed to load document." />
   ),
   component: Outlet,
 });

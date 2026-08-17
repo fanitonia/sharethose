@@ -1,10 +1,10 @@
 import { Outlet, createFileRoute, getRouteApi } from "@tanstack/react-router";
 
-import { EditDocumentButton } from "@/features/document/components/DocumentActions/EditDocument";
 import {
   DocumentSidebar,
   DocumentSidebarMobile,
-} from "@/features/document/components/DocumentSidebar";
+  EditDocumentTrigger,
+} from "@/features/document/components";
 
 export const Route = createFileRoute("/doc/$documentSlug/page")({
   component: RouteComponent,
@@ -37,7 +37,7 @@ function RouteComponent() {
         </div>
         {/* TODO: it's like this for now. this should be in like a "settings" menu in sidebar or something */}
         <div className="fixed right-4 bottom-6 z-50 xl:static xl:mr-4 xl:mb-6 xl:max-h-fit xl:self-end">
-          <EditDocumentButton document={document} className="rounded-none" />
+          <EditDocumentTrigger document={document} className="rounded-none" />
         </div>
       </div>
     </div>

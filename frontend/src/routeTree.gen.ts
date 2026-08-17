@@ -14,8 +14,8 @@ import { Route as CreateIndexRouteImport } from "./routes/create/index"
 import { Route as DocDocumentSlugRouteRouteImport } from "./routes/doc/$documentSlug/route"
 import { Route as DocDocumentSlugIndexRouteImport } from "./routes/doc/$documentSlug/index"
 import { Route as DocDocumentSlugPageRouteRouteImport } from "./routes/doc/$documentSlug/page/route"
-import { Route as DocDocumentSlugPageIndexRouteImport } from "./routes/doc/$documentSlug/page/index"
 import { Route as DocDocumentSlugEditIndexRouteImport } from "./routes/doc/$documentSlug/edit/index"
+import { Route as DocDocumentSlugPageIndexRouteImport } from "./routes/doc/$documentSlug/page/index"
 import { Route as DocDocumentSlugPagePageSlugRouteImport } from "./routes/doc/$documentSlug/page/$pageSlug"
 
 const IndexRoute = IndexRouteImport.update({
@@ -44,17 +44,17 @@ const DocDocumentSlugPageRouteRoute =
     path: "/page",
     getParentRoute: () => DocDocumentSlugRouteRoute,
   } as any)
-const DocDocumentSlugPageIndexRoute =
-  DocDocumentSlugPageIndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => DocDocumentSlugPageRouteRoute,
-  } as any)
 const DocDocumentSlugEditIndexRoute =
   DocDocumentSlugEditIndexRouteImport.update({
     id: "/edit/",
     path: "/edit/",
     getParentRoute: () => DocDocumentSlugRouteRoute,
+  } as any)
+const DocDocumentSlugPageIndexRoute =
+  DocDocumentSlugPageIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => DocDocumentSlugPageRouteRoute,
   } as any)
 const DocDocumentSlugPagePageSlugRoute =
   DocDocumentSlugPagePageSlugRouteImport.update({
@@ -166,19 +166,19 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DocDocumentSlugPageRouteRouteImport
       parentRoute: typeof DocDocumentSlugRouteRoute
     }
-    "/doc/$documentSlug/page/": {
-      id: "/doc/$documentSlug/page/"
-      path: "/"
-      fullPath: "/doc/$documentSlug/page/"
-      preLoaderRoute: typeof DocDocumentSlugPageIndexRouteImport
-      parentRoute: typeof DocDocumentSlugPageRouteRoute
-    }
     "/doc/$documentSlug/edit/": {
       id: "/doc/$documentSlug/edit/"
       path: "/edit"
       fullPath: "/doc/$documentSlug/edit/"
       preLoaderRoute: typeof DocDocumentSlugEditIndexRouteImport
       parentRoute: typeof DocDocumentSlugRouteRoute
+    }
+    "/doc/$documentSlug/page/": {
+      id: "/doc/$documentSlug/page/"
+      path: "/"
+      fullPath: "/doc/$documentSlug/page/"
+      preLoaderRoute: typeof DocDocumentSlugPageIndexRouteImport
+      parentRoute: typeof DocDocumentSlugPageRouteRoute
     }
     "/doc/$documentSlug/page/$pageSlug": {
       id: "/doc/$documentSlug/page/$pageSlug"

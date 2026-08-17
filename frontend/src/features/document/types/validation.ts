@@ -1,3 +1,4 @@
+import type { ValidationErrorGroup } from "@/types/validationErrorGroup";
 import { z } from "zod";
 
 import type { DocumentDraft } from "./draft";
@@ -5,16 +6,6 @@ import type { DocumentDraft } from "./draft";
 const TITLE_MAX_LENGTH = 50;
 const PAGE_NAME_MAX_LENGTH = 50;
 const PAGE_CONTENT_MAX_LENGTH = 100000;
-
-type DraftPageValidationErrors = {
-  name?: string;
-  content?: string;
-};
-
-type DraftValidationErrors = {
-  title?: string;
-  pages?: Record<number, DraftPageValidationErrors>;
-};
 
 const titleSchema = z
   .string()
@@ -45,27 +36,31 @@ const pageSchema = z.object({
 });
 
 function validateDraft(draft: DocumentDraft) {
-  const errors: DraftValidationErrors = {};
+  const errors: ValidationErrorGroup[] = [];
 
   const titleResult = titleSchema.safeParse(draft.title);
   if (!titleResult.success) {
-    errors.title = titleResult.error.issues[0]?.message ?? "Document title is invalid.";
+    errors.push({
+      key: "document",
+      title: "Document",
+      errors: [titleResult.error.issues[0]?.message ?? "Document title is invalid."],
+    });
   }
 
   const seenNames = new Map<string, number>();
-  const pageErrors: Record<number, DraftPageValidationErrors> = {};
+  const pageErrors: Record<number, string[]> = {};
 
   draft.pages.forEach((page, index) => {
     const result = pageSchema.safeParse(page);
-    const issues: DraftPageValidationErrors = {};
+    const errorsForPage: string[] = [];
 
     if (!result.success) {
       result.error.issues.forEach((issue) => {
-        if (issue.path[0] === "name" && !issues.name) {
-          issues.name = issue.message;
-        }
-        if (issue.path[0] === "content" && !issues.content) {
-          issues.content = issue.message;
+        if (
+          (issue.path[0] === "name" || issue.path[0] === "content") &&
+          !errorsForPage.includes(issue.message)
+        ) {
+          errorsForPage.push(issue.message);
         }
       });
     }
@@ -74,32 +69,36 @@ function validateDraft(draft: DocumentDraft) {
     if (normalizedName.length > 0) {
       const existingIndex = seenNames.get(normalizedName);
       if (existingIndex !== undefined) {
-        issues.name = "Page names must be unique.";
-        if (!pageErrors[existingIndex]?.name) {
-          pageErrors[existingIndex] = {
-            ...pageErrors[existingIndex],
-            name: "Page names must be unique.",
-          };
+        const duplicateError = "Page names must be unique.";
+        if (!errorsForPage.includes(duplicateError)) {
+          errorsForPage.push(duplicateError);
+        }
+        const errorsForExistingPage = (pageErrors[existingIndex] ??= []);
+        if (!errorsForExistingPage.includes(duplicateError)) {
+          errorsForExistingPage.push(duplicateError);
         }
       } else {
         seenNames.set(normalizedName, index);
       }
     }
 
-    if (issues.name || issues.content) {
-      pageErrors[index] = { ...pageErrors[index], ...issues };
+    if (errorsForPage.length > 0) {
+      pageErrors[index] = errorsForPage;
     }
   });
 
-  if (Object.keys(pageErrors).length > 0) {
-    errors.pages = pageErrors;
-  }
+  Object.entries(pageErrors).forEach(([index, pageErrorsForPage]) => {
+    errors.push({
+      key: `page-${index}`,
+      title: `Page ${Number(index) + 1}`,
+      errors: pageErrorsForPage,
+    });
+  });
 
   return {
-    success: !errors.title && !errors.pages,
+    success: errors.length === 0,
     errors,
   };
 }
 
-export type { DraftPageValidationErrors, DraftValidationErrors };
 export { TITLE_MAX_LENGTH, PAGE_NAME_MAX_LENGTH, PAGE_CONTENT_MAX_LENGTH, validateDraft };

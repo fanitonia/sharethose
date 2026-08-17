@@ -7,7 +7,6 @@ import type { Document } from "@/features/document/types/api";
 import type { DocumentDraft } from "@/features/document/types/draft";
 import { convertToUpdateDocumentRequest } from "@/features/document/types/draft";
 import { validateDraft } from "@/features/document/types/validation";
-import { getValidationErrorGroups } from "@/features/document/utils/getValidationErrorGroups";
 
 type SaveDialogState = "idle" | "validation" | "error";
 
@@ -27,10 +26,7 @@ function useUpdateDocument(
   const [dialogState, setDialogState] = useState<SaveDialogState>("idle");
   const [error, setError] = useState<unknown>(null);
 
-  const validationErrors = useMemo(
-    () => getValidationErrorGroups(validateDraft(draft).errors),
-    [draft]
-  );
+  const validationErrors = useMemo(() => validateDraft(draft).errors, [draft]);
 
   function save() {
     if (!validateDraft(draft).success) {

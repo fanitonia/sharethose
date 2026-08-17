@@ -5,7 +5,6 @@ import type { DocumentWithKey } from "@/features/document/types/api";
 import type { DocumentDraft } from "@/features/document/types/draft";
 import { convertToCreateDocumentRequest } from "@/features/document/types/draft";
 import { validateDraft } from "@/features/document/types/validation";
-import { getValidationErrorGroups } from "@/features/document/utils/getValidationErrorGroups";
 
 type ShareDialogState = "idle" | "validation" | "result";
 
@@ -19,10 +18,7 @@ function useShareDocument(draft: DocumentDraft, options?: UseShareDocumentOption
   const [sharedDocument, setSharedDocument] = useState<DocumentWithKey | null>(null);
   const [error, setError] = useState<unknown>(null);
 
-  const validationErrors = useMemo(
-    () => getValidationErrorGroups(validateDraft(draft).errors),
-    [draft]
-  );
+  const validationErrors = useMemo(() => validateDraft(draft).errors, [draft]);
 
   function share() {
     if (!validateDraft(draft).success) {

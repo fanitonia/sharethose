@@ -5,7 +5,7 @@ import ReactDOM from "react-dom/client";
 
 import { StrictMode } from "react";
 
-import { ThemeProvider } from "@/context/ThemeProvider";
+import { ThemeProvider } from "@/context/theme-provider";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 
