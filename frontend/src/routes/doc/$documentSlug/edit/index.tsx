@@ -12,7 +12,7 @@ import {
   DocumentSettingsDialog,
   EditorActions,
   MarkdownEditor,
-} from "@/features/document/components";
+} from "@/features/document/components/editor";
 import { DocumentEditorProvider } from "@/features/document/context/editor-provider";
 import { useDocumentEditor } from "@/features/document/hooks/useDocumentEditor";
 import type { Document } from "@/features/document/types/api";

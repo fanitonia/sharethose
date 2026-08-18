@@ -1,10 +1,7 @@
 import { Outlet, createFileRoute, getRouteApi } from "@tanstack/react-router";
 
-import {
-  DocumentSidebar,
-  DocumentSidebarMobile,
-  EditDocumentTrigger,
-} from "@/features/document/components";
+import { EditDocumentTrigger } from "@/features/document/components";
+import { DocumentSidebar, DocumentSidebarMobile } from "@/features/document/components/navigation";
 
 export const Route = createFileRoute("/doc/$documentSlug/page")({
   component: RouteComponent,

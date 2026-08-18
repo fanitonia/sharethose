@@ -3,7 +3,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Textarea } from "@/components/ui/textarea";
 
-import { MarkdownRenderer } from "@/features/document/components/markdown/renderer";
+import { MarkdownRenderer } from "@/features/document/components/markdown";
 import { PAGE_CONTENT_MAX_LENGTH } from "@/features/document/types/validation";
 
 interface MarkdownEditorProps {

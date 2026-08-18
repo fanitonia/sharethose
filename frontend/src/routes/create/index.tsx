@@ -5,7 +5,7 @@ import {
   DocumentEditorSidebar,
   MarkdownEditor,
   ShareDocumentButton,
-} from "@/features/document/components";
+} from "@/features/document/components/editor";
 import { DocumentEditorProvider } from "@/features/document/context/editor-provider";
 import { useDocumentEditor } from "@/features/document/hooks/useDocumentEditor";
 

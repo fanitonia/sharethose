@@ -14,7 +14,7 @@ import { useDocumentEditor } from "@/features/document/hooks/useDocumentEditor";
 import { useShareDocument } from "@/features/document/hooks/useShareDocument";
 import type { DocumentWithKey } from "@/features/document/types/api";
 
-import { ValidationErrors } from "../../../components/feedback/error/validation-errors";
+import { ValidationErrors } from "../../../../components/feedback/error/validation-errors";
 
 // TOOD: find a better solution for this
 function getDocumentUrl(sharedDocument: DocumentWithKey): string {

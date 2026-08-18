@@ -12,7 +12,7 @@ import { useDocumentEditor } from "@/features/document/hooks/useDocumentEditor";
 import { useUpdateDocument } from "@/features/document/hooks/useUpdateDocument";
 import type { Document } from "@/features/document/types/api";
 
-import { ValidationErrors } from "../../../components/feedback/error/validation-errors";
+import { ValidationErrors } from "../../../../components/feedback/error/validation-errors";
 
 interface UpdateDocumentButtonProps {
   className?: string;

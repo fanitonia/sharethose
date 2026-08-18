@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { DraftRecoveryDialog } from "@/features/document/components";
+import { DraftRecoveryDialog } from "@/features/document/components/draft";
 import { MAX_PAGE_COUNT } from "@/features/document/constants";
 import { DocumentEditorContext } from "@/features/document/context/editor-context";
 import { useDocumentDraft } from "@/features/document/hooks/useDocumentDraft";
