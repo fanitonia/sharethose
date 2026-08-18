@@ -45,6 +45,29 @@ function DocumentEditorProvider({
     );
   }
 
+  function reorderPages(fromIndex: number, toIndex: number) {
+    if (fromIndex === toIndex || !draft.pages[fromIndex] || !draft.pages[toIndex]) {
+      return;
+    }
+
+    actions.reorderPages(fromIndex, toIndex);
+    setSelectedPageIndex((currentIndex) => {
+      if (currentIndex === fromIndex) {
+        return toIndex;
+      }
+
+      if (fromIndex < toIndex && currentIndex > fromIndex && currentIndex <= toIndex) {
+        return currentIndex - 1;
+      }
+
+      if (toIndex < fromIndex && currentIndex >= toIndex && currentIndex < fromIndex) {
+        return currentIndex + 1;
+      }
+
+      return currentIndex;
+    });
+  }
+
   function selectPage(index: number) {
     if (draft.pages[index]) {
       setSelectedPageIndex(index);
@@ -60,6 +83,7 @@ function DocumentEditorProvider({
           clearDraft,
           addPage,
           deletePage,
+          reorderPages,
           selectedPageIndex,
           selectPage,
         }}

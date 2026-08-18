@@ -18,6 +18,7 @@ interface DocumentEditorContextValue {
   updatePageContent: (index: number, content: string) => void;
   addPage: () => void;
   deletePage: (index: number) => void;
+  reorderPages: (fromIndex: number, toIndex: number) => void;
   selectPage: (index: number) => void;
 }
 

@@ -2,6 +2,7 @@ import type { CreateDocumentRequest, Document, UpdateDocumentContentRequest } fr
 
 interface DraftPage {
   id: string;
+  documentPageId?: number;
   name: string;
   content: string;
 }
@@ -23,25 +24,19 @@ function convertDocumentToDraft(document: Document): DocumentDraft {
     title: document.title,
     pages: document.pages.map((page) => ({
       id: crypto.randomUUID(),
+      documentPageId: page.id,
       name: page.name,
       content: page.content,
     })),
   };
 }
 
-function convertToUpdateDocumentRequest(
-  draft: DocumentDraft,
-  document: Document
-): UpdateDocumentContentRequest {
+function convertToUpdateDocumentRequest(draft: DocumentDraft): UpdateDocumentContentRequest {
   return {
     title: draft.title,
-    pages: draft.pages.map((page, index) => {
-      const existingPage = document.pages[index];
-
-      return existingPage
-        ? { id: existingPage.id, name: page.name, content: page.content }
-        : { name: page.name, content: page.content };
-    }),
+    pages: draft.pages.map(({ documentPageId, name, content }) =>
+      documentPageId !== undefined ? { id: documentPageId, name, content } : { name, content }
+    ),
   };
 }
 

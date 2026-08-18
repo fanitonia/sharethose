@@ -18,6 +18,7 @@ type DraftAction =
   | { type: "UPDATE_PAGE_CONTENT"; index: number; content: string }
   | { type: "ADD_PAGE" }
   | { type: "DELETE_PAGE"; index: number }
+  | { type: "REORDER_PAGE"; fromIndex: number; toIndex: number }
   | { type: "RESET"; draft: DocumentDraft };
 
 function createPage(): DraftPage {
@@ -175,6 +176,19 @@ function reducer(state: DocumentDraft, action: DraftAction): DocumentDraft {
         ...state,
         pages: state.pages.filter((_, index) => index !== action.index),
       };
+    case "REORDER_PAGE": {
+      const { fromIndex, toIndex } = action;
+
+      if (fromIndex === toIndex || !state.pages[fromIndex] || !state.pages[toIndex]) {
+        return state;
+      }
+
+      const pages = [...state.pages];
+      const [page] = pages.splice(fromIndex, 1);
+      pages.splice(toIndex, 0, page);
+
+      return { ...state, pages };
+    }
     case "RESET":
       return action.draft;
   }
@@ -295,6 +309,8 @@ function useDocumentDraft(options?: UseDocumentDraftOptions) {
       dispatch({ type: "UPDATE_PAGE_CONTENT", index, content }),
     addPage: () => dispatch({ type: "ADD_PAGE" }),
     deletePage: (index: number) => dispatch({ type: "DELETE_PAGE", index }),
+    reorderPages: (fromIndex: number, toIndex: number) =>
+      dispatch({ type: "REORDER_PAGE", fromIndex, toIndex }),
   };
 }
 

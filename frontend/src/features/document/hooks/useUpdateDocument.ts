@@ -37,7 +37,7 @@ function useUpdateDocument(
     setError(null);
     updateDocument.mutate(
       {
-        request: convertToUpdateDocumentRequest(draft, document),
+        request: convertToUpdateDocumentRequest(draft),
         documentId: document.id,
         editKey: options.editKey,
       },

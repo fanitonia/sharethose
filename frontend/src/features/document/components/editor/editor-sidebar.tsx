@@ -1,6 +1,23 @@
+import {
+  DndContext,
+  type DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
 import { useState } from "react";
 
-import { Ellipsis, MenuIcon, Pencil, Plus, Trash2Icon } from "lucide-react";
+import { Ellipsis, GripVertical, MenuIcon, Pencil, Plus, Trash2Icon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -19,6 +36,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { MAX_PAGE_COUNT } from "@/features/document/constants";
 import { useDocumentEditor } from "@/features/document/hooks/useDocumentEditor";
 import { useInlineEdit } from "@/features/document/hooks/useInlineEdit";
+import type { DraftPage } from "@/features/document/types/draft";
 import { PAGE_NAME_MAX_LENGTH, TITLE_MAX_LENGTH } from "@/features/document/types/validation";
 
 interface DocumentEditorSidebarProps {
@@ -26,11 +44,139 @@ interface DocumentEditorSidebarProps {
   onPageSelect?: () => void;
 }
 
+interface SortablePageItemProps {
+  page: DraftPage;
+  index: number;
+  isSelected: boolean;
+  isEditing: boolean;
+  pageEditValue: string;
+  onPageSelect: () => void;
+  onPageEditChange: (value: string) => void;
+  onPageEditCommit: () => void;
+  onPageEditCancel: () => void;
+  onRename: () => void;
+  onDelete: () => void;
+}
+
+function SortablePageItem({
+  page,
+  index,
+  isSelected,
+  isEditing,
+  pageEditValue,
+  onPageSelect,
+  onPageEditChange,
+  onPageEditCommit,
+  onPageEditCancel,
+  onRename,
+  onDelete,
+}: SortablePageItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: page.id,
+    disabled: isEditing,
+  });
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={cn(
+        "group relative flex w-full flex-col hover:bg-secondary",
+        isSelected && "bg-secondary",
+        isDragging && "z-10 opacity-50"
+      )}
+    >
+      <div className="relative flex w-full items-center">
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-1 z-10 touch-none text-muted-foreground opacity-100 transition-opacity group-hover:opacity-100 hover:bg-transparent focus-visible:opacity-100 lg:opacity-0"
+                aria-label={`Reorder ${page.name || `page ${index + 1}`}`}
+                disabled={isEditing}
+                {...attributes}
+                {...listeners}
+              />
+            }
+          >
+            <GripVertical className="size-4" />
+          </TooltipTrigger>
+          <TooltipContent>Drag to reorder</TooltipContent>
+        </Tooltip>
+        {isEditing ? (
+          <Input
+            variant="inline"
+            autoFocus
+            aria-label={`Rename page ${index + 1}`}
+            className="flex-1 px-10 py-2 text-center text-sm"
+            value={pageEditValue}
+            maxLength={PAGE_NAME_MAX_LENGTH}
+            onChange={(event) => onPageEditChange(event.target.value)}
+            onBlur={onPageEditCommit}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") onPageEditCommit();
+              if (event.key === "Escape") onPageEditCancel();
+            }}
+          />
+        ) : (
+          <Button
+            variant="ghost"
+            className={cn(
+              "min-w-0 flex-1 justify-center rounded-none px-10 text-center",
+              !page.name && "text-destructive"
+            )}
+            onClick={onPageSelect}
+          >
+            {page.name || "Please enter a page name"}
+          </Button>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 text-white opacity-100 transition-opacity group-hover:text-muted-foreground group-hover:opacity-100 hover:bg-transparent focus-visible:opacity-100 lg:opacity-0"
+              />
+            }
+          >
+            <Ellipsis className="size-5" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onClick={onRename}>
+              <Pencil className="mr-1" />
+              Rename
+            </DropdownMenuItem>
+            <DropdownMenuItem variant="destructive" onClick={onDelete}>
+              <Trash2Icon className="mr-1" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </li>
+  );
+}
+
 function DocumentEditorSidebar({ className, onPageSelect }: DocumentEditorSidebarProps) {
-  const { draft, setTitle, addPage, selectedPageIndex, selectPage, deletePage, renamePage } =
-    useDocumentEditor();
+  const {
+    draft,
+    setTitle,
+    addPage,
+    selectedPageIndex,
+    selectPage,
+    deletePage,
+    renamePage,
+    reorderPages,
+  } = useDocumentEditor();
   const titleEdit = useInlineEdit(setTitle);
   const [editingPageIndex, setEditingPageIndex] = useState<number | null>(null);
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
   const pageEdit = useInlineEdit((name) => {
     if (editingPageIndex !== null) {
       renamePage(editingPageIndex, name);
@@ -41,6 +187,19 @@ function DocumentEditorSidebar({ className, onPageSelect }: DocumentEditorSideba
   function startRenaming(index: number) {
     setEditingPageIndex(index);
     pageEdit.start(draft.pages[index].name || "");
+  }
+
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const fromIndex = draft.pages.findIndex((page) => page.id === active.id);
+    const toIndex = draft.pages.findIndex((page) => page.id === over.id);
+
+    if (fromIndex !== -1 && toIndex !== -1) {
+      reorderPages(fromIndex, toIndex);
+    }
   }
 
   return (
@@ -123,73 +282,38 @@ function DocumentEditorSidebar({ className, onPageSelect }: DocumentEditorSideba
         </div>
         {/* Pages list section */}
         <ScrollArea className="min-h-0 flex-1">
-          <ul className="flex w-full flex-col">
-            {draft.pages.map((page, index) => (
-              <li
-                key={page.id}
-                className={cn(
-                  "group relative flex w-full flex-col hover:bg-secondary",
-                  index === selectedPageIndex && "bg-secondary"
-                )}
-              >
-                <div className="relative flex w-full items-center">
-                  {editingPageIndex === index ? (
-                    <Input
-                      variant="inline"
-                      autoFocus
-                      aria-label={`Rename page ${index + 1}`}
-                      className="flex-1 px-3 py-2 text-center text-sm"
-                      value={pageEdit.value}
-                      maxLength={PAGE_NAME_MAX_LENGTH}
-                      onChange={(event) => pageEdit.setValue(event.target.value)}
-                      onBlur={pageEdit.commit}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") pageEdit.commit();
-                        if (event.key === "Escape") pageEdit.cancel();
-                      }}
-                    />
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      className={cn(
-                        "min-w-0 flex-1 justify-center rounded-none px-0 text-center",
-                        !page.name && "text-destructive"
-                      )}
-                      onClick={() => {
-                        selectPage(index);
-                        onPageSelect?.();
-                      }}
-                    >
-                      {page.name || "Please enter a page name"}
-                    </Button>
-                  )}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      render={
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute right-1 text-white opacity-100 transition-opacity group-hover:text-muted-foreground group-hover:opacity-100 hover:bg-transparent focus-visible:opacity-100 lg:opacity-0"
-                        />
-                      }
-                    >
-                      <Ellipsis className="size-5" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => startRenaming(index)}>
-                        <Pencil className="mr-1" />
-                        Rename
-                      </DropdownMenuItem>
-                      <DropdownMenuItem variant="destructive" onClick={() => deletePage(index)}>
-                        <Trash2Icon className="mr-1" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <DndContext
+            collisionDetection={closestCenter}
+            sensors={sensors}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={draft.pages.map((page) => page.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <ul className="flex w-full flex-col">
+                {draft.pages.map((page, index) => (
+                  <SortablePageItem
+                    key={page.id}
+                    page={page}
+                    index={index}
+                    isSelected={index === selectedPageIndex}
+                    isEditing={editingPageIndex === index}
+                    pageEditValue={pageEdit.value}
+                    onPageSelect={() => {
+                      selectPage(index);
+                      onPageSelect?.();
+                    }}
+                    onPageEditChange={pageEdit.setValue}
+                    onPageEditCommit={pageEdit.commit}
+                    onPageEditCancel={pageEdit.cancel}
+                    onRename={() => startRenaming(index)}
+                    onDelete={() => deletePage(index)}
+                  />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
         </ScrollArea>
       </div>
     </nav>
