@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import { useState } from "react";
 
-import { LogOut, MoreHorizontalIcon, Trash } from "lucide-react";
+import { LogOut, MoreHorizontalIcon, Settings, Trash } from "lucide-react";
 
 import {
   AlertDialog,
@@ -28,6 +28,7 @@ import {
 import { useDocumentEditor } from "@/features/document/hooks/useDocumentEditor";
 import type { Document } from "@/features/document/types/api";
 
+import { DocumentSettingsDialog } from "./document-settings-dialog";
 import { UpdateDocumentButton } from "./update-document-trigger";
 
 interface EditorActionsProps {
@@ -39,6 +40,7 @@ interface EditorActionsProps {
 function EditorActions({ document, editKey, className }: EditorActionsProps) {
   const { clearDraft } = useDocumentEditor();
   const [isStartOverOpen, setIsStartOverOpen] = useState(false);
+  const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
 
   const navigate = useNavigate();
   return (
@@ -76,6 +78,15 @@ function EditorActions({ document, editKey, className }: EditorActionsProps) {
               </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          {/* Document Settings Button */}
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Document settings"
+            onClick={() => setOpenSettingsDialog(true)}
+          >
+            <Settings />
+          </Button>
           <UpdateDocumentButton document={document} editKey={editKey} />
         </ButtonGroup>
       </div>
@@ -100,6 +111,13 @@ function EditorActions({ document, editKey, className }: EditorActionsProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      {/* Document Settings Dialog */}
+      <DocumentSettingsDialog
+        document={document}
+        editKey={editKey}
+        open={openSettingsDialog}
+        onOpenChange={setOpenSettingsDialog}
+      />
     </>
   );
 }

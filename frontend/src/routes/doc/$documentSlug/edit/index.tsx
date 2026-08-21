@@ -66,14 +66,6 @@ function EditDocumentEditor({ document, editKey }: EditDocumentEditorProps) {
           <DocumentEditorSidebar className="hidden h-screen w-72 shrink-0 justify-center bg-card/80 py-5 lg:sticky lg:top-0 lg:flex xl:w-80" />
           <div className="flex h-full flex-1 flex-col">
             <div className="flex items-center gap-2 border bg-card px-4 py-4">
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Document settings"
-                onClick={() => setOpenSettingsDialog(true)}
-              >
-                <Settings />
-              </Button>
               <EditorActions document={document} editKey={editKey} className="ml-auto flex gap-2" />
             </div>
             <MarkdownEditor
@@ -84,12 +76,6 @@ function EditDocumentEditor({ document, editKey }: EditDocumentEditorProps) {
           </div>
         </div>
       </div>
-      <DocumentSettingsDialog
-        document={document}
-        editKey={editKey}
-        open={openSettingsDialog}
-        onOpenChange={setOpenSettingsDialog}
-      />
     </>
   );
 }
