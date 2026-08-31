@@ -1,17 +1,11 @@
 import { Navigate, createFileRoute, getRouteApi } from "@tanstack/react-router";
 
-import { useState } from "react";
-
-import { Settings } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-
+import { useGetDocument } from "@/features/document/api";
 import {
   DocumentEditorMobileSidebar,
   DocumentEditorSidebar,
-  DocumentSettingsDialog,
-  EditorActions,
   MarkdownEditor,
+  UpdateDocumentActions,
 } from "@/features/document/components/editor";
 import { DocumentEditorProvider } from "@/features/document/context/editor-provider";
 import { useDocumentEditor } from "@/features/document/hooks/useDocumentEditor";
@@ -26,7 +20,9 @@ export const Route = createFileRoute("/doc/$documentSlug/edit/")({
 const documentRoute = getRouteApi("/doc/$documentSlug");
 
 function RouteComponent() {
-  const document = documentRoute.useLoaderData();
+  const { documentSlug } = Route.useParams();
+  const loaderDocument = documentRoute.useLoaderData();
+  const { data: document = loaderDocument } = useGetDocument(documentSlug);
   const editKey = getEditKey(document.slug);
 
   if (!editKey) {
@@ -51,7 +47,6 @@ interface EditDocumentEditorProps {
 function EditDocumentEditor({ document, editKey }: EditDocumentEditorProps) {
   const { draft, selectedPageIndex, updatePageContent } = useDocumentEditor();
   const selectedPage = draft.pages[selectedPageIndex];
-  const [openSettingsDialog, setOpenSettingsDialog] = useState(false);
 
   return (
     <>
@@ -66,7 +61,7 @@ function EditDocumentEditor({ document, editKey }: EditDocumentEditorProps) {
           <DocumentEditorSidebar className="hidden h-screen w-72 shrink-0 justify-center bg-card/80 py-5 lg:sticky lg:top-0 lg:flex xl:w-80" />
           <div className="flex h-full flex-1 flex-col">
             <div className="flex items-center gap-2 border bg-card px-4 py-4">
-              <EditorActions document={document} editKey={editKey} className="ml-auto flex gap-2" />
+              <UpdateDocumentActions document={document} editKey={editKey} className="ml-auto" />
             </div>
             <MarkdownEditor
               className="min-h-0 flex-1"

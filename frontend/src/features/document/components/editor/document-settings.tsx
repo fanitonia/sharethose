@@ -4,24 +4,15 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { DatePickerWithTime } from "@/components/ui/date-picker";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 
 import { useUpdateDocumentExpiration, useUpdateDocumentPassword } from "@/features/document/api";
 import type { Document } from "@/features/document/types/api";
 
-interface DocumentSettingsDialogProps {
+interface DocumentSettingsProps {
   document: Document;
   editKey: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
 }
 
 interface SettingsFieldProps {
@@ -47,12 +38,7 @@ function SettingsField({ children, description, disabled, label, onSave }: Setti
   );
 }
 
-function DocumentSettingsDialog({
-  document,
-  editKey,
-  open,
-  onOpenChange,
-}: DocumentSettingsDialogProps) {
+function DocumentSettings({ document, editKey }: DocumentSettingsProps) {
   const documentId = document.id;
   const updateExpiration = useUpdateDocumentExpiration();
   const updatePassword = useUpdateDocumentPassword();
@@ -107,55 +93,38 @@ function DocumentSettingsDialog({
     );
   }
 
-  function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen) {
-      updateExpiration.reset();
-      updatePassword.reset();
-    }
-
-    onOpenChange(nextOpen);
-  }
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Document settings</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-6">
-          <SettingsField
-            label="Expires at"
-            description="Clear the date to remove expiration."
-            disabled={isPending}
-            onSave={saveExpiration}
-          >
-            <DatePickerWithTime
-              disablePastDates
-              disabled={isPending}
-              id="document-expire-at"
-              onChange={setExpireAt}
-              value={expireAt}
-            />
-          </SettingsField>
-          <SettingsField
-            label="Password"
-            description="Leave empty to remove password protection."
-            disabled={isPending}
-            onSave={savePassword}
-          >
-            <Input
-              id="document-password"
-              type="password"
-              placeholder="New password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </SettingsField>
-        </div>
-        <DialogFooter showCloseButton />
-      </DialogContent>
-    </Dialog>
+    <div className="space-y-6">
+      <SettingsField
+        label="Expires at"
+        description="Clear the date to remove expiration."
+        disabled={isPending}
+        onSave={saveExpiration}
+      >
+        <DatePickerWithTime
+          disablePastDates
+          disabled={isPending}
+          id="document-expire-at"
+          onChange={setExpireAt}
+          value={expireAt}
+        />
+      </SettingsField>
+      <SettingsField
+        label="Password"
+        description="Leave empty to remove password protection."
+        disabled={isPending}
+        onSave={savePassword}
+      >
+        <Input
+          id="document-password"
+          type="password"
+          placeholder="New password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+      </SettingsField>
+    </div>
   );
 }
 
-export { DocumentSettingsDialog };
+export { DocumentSettings };
